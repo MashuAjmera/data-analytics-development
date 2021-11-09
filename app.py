@@ -21,7 +21,7 @@ def before_first_request():
     global key
     key = Fernet.generate_key()
 
-@app.route("/api/login", methods = ["POST"])
+@app.route("/api/user/login", methods = ["POST"])
 def login():
     responsereq = request.data
     jsonvalue = loads(responsereq)
