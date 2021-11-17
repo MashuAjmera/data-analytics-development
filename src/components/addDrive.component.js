@@ -1,16 +1,25 @@
 import React, { Component } from "react";
-import { Card, Modal, Steps } from "antd";
+import { Modal, Steps, List, Button } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 
 export default class AddDrive extends Component {
-  state = { driveModel: false, current: 0 };
+  state = { driveModel: false, current: 0, drives: [], drive: null };
 
-  componentDidMount() {}
+  componentDidMount() {
+    // FETCH name of all the drives GET /api/drives
+    this.setState({ drives: ["ACS880", "ACC800"] });
+  }
 
   changeDriveModal = () => {
-    this.setState({ driveModal: !this.state.driveModal, current:0 });
+    this.setState({ driveModal: !this.state.driveModal, current: 0 });
   };
 
-  changeCurrent = current => {
+  loadProtocols = () => {
+    // FETCH protocols supported by selected drive id
+    // this.setState({})
+  };
+
+  changeCurrent = (current) => {
     this.setState({ current });
   };
 
@@ -18,21 +27,22 @@ export default class AddDrive extends Component {
     const { Step } = Steps;
     const steps = [
       {
-        title: 'Drive',
-        content: <List
-        size="small"
-        bordered
-        dataSource={[]}
-        renderItem={item => <List.Item>{item}</List.Item>}
-      />,
+        title: "Drive",
+        content: (
+          <List
+            size="small"
+            dataSource={this.state.drives}
+            renderItem={(item) => <List.Item>{item}</List.Item>}
+          />
+        ),
       },
       {
-        title: 'Protocol',
-        content: 'h3i',
+        title: "Protocol",
+        content: "h3i",
       },
       {
-        title: 'Data Points',
-        content: 'h4i',
+        title: "Data Points",
+        content: "h4i",
       },
     ];
     return (
@@ -44,21 +54,21 @@ export default class AddDrive extends Component {
           onCancel={this.changeDriveModal}
         >
           <Steps current={this.state.current} onChange={this.changeCurrent}>
-                  {steps.map(item => <Step key={item.title} title={item.title} content={item.content} />)}
-                </Steps>
-                <div className="steps-content">{steps[this.state.current].content}</div>
+            {steps.map((item) => (
+              <Step
+                key={item.title}
+                title={item.title}
+                content={item.content}
+              />
+            ))}
+          </Steps>
+          <div className="steps-content">
+            {steps[this.state.current].content}
+          </div>
         </Modal>
-        <Card
-          size="small"
-          style={{
-            width: 300,
-            background: "#f0f2f5",
-            border: "1px dashed red",
-          }}
-          onClick={this.changeDriveModal}
-        >
-          Add
-        </Card>
+        <Button icon={<PlusOutlined />} onClick={this.changeDriveModal}>
+          Add An Existing Drive
+        </Button>
       </>
     );
   }
