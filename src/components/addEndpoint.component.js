@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { Card, Modal } from "antd";
+import { Button, Modal } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 
 export default class AddEndpoint extends Component {
   state = { driveModel: false };
@@ -23,17 +24,9 @@ export default class AddEndpoint extends Component {
           <p>Some contents...</p>
           <p>Some contents...</p>
         </Modal>
-        <Card
-          size="small"
-          style={{
-            width: 300,
-            background: "#f0f2f5",
-            border: "1px dashed red",
-          }}
-          onClick={this.changeDriveModal}
-        >
-          Add
-        </Card>
+            <Button icon={<PlusOutlined />} onClick={this.changeDriveModal}>
+            Add An Existing Endpoint
+          </Button>
       </>
     );
   }
