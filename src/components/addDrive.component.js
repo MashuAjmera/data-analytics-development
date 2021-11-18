@@ -67,7 +67,7 @@ export default class AddDrive extends Component {
           </div>
         </Modal>
         <Button icon={<PlusOutlined />} onClick={this.changeDriveModal}>
-          Add An Existing Drive
+          Add Drive
         </Button>
       </>
     );
