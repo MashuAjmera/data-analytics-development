@@ -1,32 +1,49 @@
 import React, { Component } from "react";
 import {
   Collapse,
+  Skeleton,
   Button,
   PageHeader,
   Typography,
   Empty,
   Popover,
+  message,
   Input,
 } from "antd";
-import {
-  DeleteOutlined,
-  AppstoreAddOutlined,
-  FileAddOutlined,
-  FolderAddOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, AppstoreAddOutlined } from "@ant-design/icons";
 import Client from "./client.component";
 
 export default class Clients extends Component {
-  state = { clients: [], createClientLoading: false };
+  state = {
+    clients: [],
+    createClientLoading: false,
+    token: null,
+    loadClients: false,
+  };
 
   componentDidMount() {
+    const token =
+      "gAAAAABhZnwaPs6apOa89Ck12PA1ZLq7TNq77qIYvWK7O5f6gDK8BuENXZy8x8hQ7_UzSUzGAuCROXKhHAw3l-gBNM6rXDIg8w==";
+    this.setState({ token },this.showClients);
+  }
+  
+  showClients=()=>{
+    this.setState({ loadClients: true });
     // FETCH GET /api/clients/ <- all client names
-    this.setState({
-      clients: [
-        { id: "1234", name: "cmdclient" },
-        { id: "5678", name: "oemclient" },
-      ],
-    });
+    fetch("/api/clients/", {
+      headers: { Authorization: this.state.token },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        this.setState({ loadClients: false, clients: data.clients });
+      })
+      .catch((error) => message.warning({ content: error }));
+    // this.setState({
+    //   clients: [
+    //     { id: "1234", name: "cmdclient" },
+    //     { id: "5678", name: "oemclient" },
+    //   ],
+    // });
   }
 
   createClient = (value) => {
@@ -73,6 +90,7 @@ export default class Clients extends Component {
             </Popover>,
           ]}
         />
+        <Skeleton loading={this.state.loadClients} active paragraph={{width: "100%", rows: 4}} title={false} >
         {this.state.clients.length >= 1 ? (
           <Collapse accordion bordered={false}>
             {this.state.clients.map((client) => (
@@ -82,8 +100,9 @@ export default class Clients extends Component {
             ))}
           </Collapse>
         ) : (
-          <Empty description={<span>No client created yet!</span>}></Empty>
+          <Empty description={<span>No client created yet!</span>}/>
         )}
+        </Skeleton>
       </>
     );
   }
