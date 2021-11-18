@@ -21,12 +21,12 @@ export default class Clients extends Component {
 
   componentDidMount() {
     // FETCH GET /api/clients/ <- all client names
-    // this.setState({
-    //   clients: [
-    //     { id: "1234", name: "cmdclient" },
-    //     { id: "5678", name: "oemclient" },
-    //   ],
-    // });
+    this.setState({
+      clients: [
+        { id: "1234", name: "cmdclient" },
+        { id: "5678", name: "oemclient" },
+      ],
+    });
   }
 
   createClient = (value) => {
@@ -55,14 +55,8 @@ export default class Clients extends Component {
       <>
         <PageHeader
           className="site-page-header"
-          title={<Title level={2}>Clients</Title>}
+          title={<Title level={2}>Client Dashboard</Title>}
           extra={[
-            <Button type="dashed" icon={<FileAddOutlined />}>
-              Create Endpoint
-            </Button>,
-            <Button type="dashed" icon={<FolderAddOutlined />}>
-              Create Drive
-            </Button>,
             <Popover
               content={
                 <Input.Search
