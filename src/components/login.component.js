@@ -1,9 +1,12 @@
 import React, { Component } from "react";
-import { Button, message, Form, Input} from 'antd';
+import { Typography, Button, message, Form, Input} from 'antd';
 
 export default class Configure extends Component {
+  state={loading:false}
+
   onFinish = (values) => {
-    fetch('/api/login', {
+    this.setState({loading:true});
+    fetch('/api/users/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(values)
@@ -12,6 +15,7 @@ export default class Configure extends Component {
         if(data.code===2){
           localStorage.setItem("Authorization", data.token);
           this.props.setLogin(data.admin);
+          this.setState({loading:false});
           message.success(data.message);
         } else message.warning({content: data.message});
       })
@@ -23,6 +27,7 @@ export default class Configure extends Component {
   };
 
   render() {
+    const { Title } = Typography;
 
     return (
       <Form
@@ -40,9 +45,10 @@ export default class Configure extends Component {
         onFinishFailed={this.onFinishFailed}
         autoComplete="off"
       >
+      <Title style={{ textAlign: "center" }}>SignIn to Continue</Title>
         <Form.Item
           label="Username"
-          name="username"
+          name="name"
           rules={[
             {
               required: true,
@@ -72,7 +78,7 @@ export default class Configure extends Component {
             span: 16,
           }}
         >
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={this.state.loading}>
             Login
           </Button>
         </Form.Item>

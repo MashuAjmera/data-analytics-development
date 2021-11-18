@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Button, Modal, Select, Form, Input } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { PROPERTY_TYPES } from "@babel/types";
 
 export default class AddEndpoint extends Component {
   state = { modal: false, endpoints: [], endpoint: null };
