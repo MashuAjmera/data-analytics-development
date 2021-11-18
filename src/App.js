@@ -1,14 +1,14 @@
 import React, { Component } from "react";
-import { Typography, message, Layout, Menu } from "antd";
-import logo from "./static/logo.png";
+import { Typography, message, Layout, } from "antd";
 import Login from "./components/login.component";
 import Clients from "./components/clients.component";
+import ABBMenu from "./components/abbmenu.component";
 // import 'antd/dist/antd.css';
 import "./static/antd.css";
 import "./App.css";
 
 export default class App extends Component {
-  state = { status: 0, info: {}, current: 0, login: false, user: [] };
+  state = { current: '3', login: false, user: [] };
 
   componentDidMount() {}
 
@@ -22,29 +22,14 @@ export default class App extends Component {
   setLogin = (admin) => {
     this.setState({ login: !this.state.login, user: { admin } });
   };
-
+  
   render() {
     const { Header, Footer, Content } = Layout;
     const { Title } = Typography;
-    const { SubMenu } = Menu;
     return (
       <Layout>
         <Header>
-          <Menu theme="dark" mode="horizontal">
-            <Menu.Item key="1">
-              <img className="logo" src={logo} alt="ABB logo" />
-            </Menu.Item>
-            <Menu.Item key="2">Drive Data Centric App Toolkit</Menu.Item>
-            <Menu.Item key="3">Navigation One</Menu.Item>
-            <Menu.Item key="4" disabled>
-              Navigation Two
-            </Menu.Item>
-            {this.state.login && (
-              <Menu.Item key="alipay" onClick={this.logOut}>
-                LogOut
-              </Menu.Item>
-            )}
-          </Menu>
+          <ABBMenu login={this.state.login} logOut={this.logOut}/>
         </Header>
         <Content
           style={{
@@ -52,16 +37,16 @@ export default class App extends Component {
             minHeight: "calc(100vh - 15.9vh)",
           }}
         >
-          <Title style={{ textAlign: "center" }}>
-            Drive Data Centric App Toolkit
-          </Title>
           {this.state.login ? (
             <Clients user={this.state.user} />
           ) : (
-            <Login setLogin={this.setLogin} />
+            <>
+              <Title style={{ textAlign: "center" }}>SignIn to Continue</Title>
+              <Login setLogin={this.setLogin} />
+            </>
           )}
         </Content>
-        <Footer style={{ textAlign: "center" }}>©2021 ABB Ltd.</Footer>
+        <Footer style={{ textAlign: "center" }}>© 2021 ABB Ltd.</Footer>
       </Layout>
     );
   }
