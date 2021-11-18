@@ -1,16 +1,33 @@
 import React, { Component } from "react";
-import { Typography, message, Layout, } from "antd";
+import { message, Layout, } from "antd";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Login from "./components/login.component";
 import Clients from "./components/clients.component";
-import ABBMenu from "./components/abbmenu.component";
+import Harmonize from "./components/harmonize.component";
+import CreateDrive from "./components/createDrive.component";
+import Nav from "./components/nav.component";
 // import 'antd/dist/antd.css';
 import "./static/antd.css";
 import "./App.css";
 
 export default class App extends Component {
-  state = { current: '3', login: false, user: [] };
+  state = { login: false, user: {} };
 
-  componentDidMount() {}
+  componentDidMount() {
+    let token = localStorage.getItem("Authorization");
+    if(token){
+      this.setState({user:{admin:true},login:true})
+      // fetch('/api/users/checkuser', {
+      //   headers: { "Authorization": token },
+      // })
+      //   .then(response => response.json())
+      //   .then((data) => {
+      //     if(data.code===2){
+      //       this.setLogin(data.admin);
+      //     }
+      //   }).catch(error => message.warning({ content: error }));
+    }
+  }
 
   logOut = (e) => {
     localStorage.removeItem("Authorization");
@@ -25,11 +42,11 @@ export default class App extends Component {
   
   render() {
     const { Header, Footer, Content } = Layout;
-    const { Title } = Typography;
     return (
+      <BrowserRouter>
       <Layout>
         <Header>
-          <ABBMenu login={this.state.login} logOut={this.logOut}/>
+          <Nav login={this.state.login} logOut={this.logOut}/>
         </Header>
         <Content
           style={{
@@ -38,16 +55,21 @@ export default class App extends Component {
           }}
         >
           {this.state.login ? (
-            <Clients user={this.state.user} />
+            <Switch>
+              <Route path="/" exact render={(props) => (<Clients user={this.state.user} />)}/>
+              <Route path="/harmonize" component={Harmonize} />
+              <Route path="/drives" component={CreateDrive} />
+              <Route component={"Overview"} />
+            </Switch>
           ) : (
             <>
-              <Title style={{ textAlign: "center" }}>SignIn to Continue</Title>
               <Login setLogin={this.setLogin} />
             </>
           )}
         </Content>
         <Footer style={{ textAlign: "center" }}>© 2021 ABB Ltd.</Footer>
       </Layout>
+      </BrowserRouter>
     );
   }
 }
