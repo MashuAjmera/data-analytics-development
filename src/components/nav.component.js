@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Typography, Menu, Divider } from "antd";
+import {Link } from "react-router-dom";
 import {
   AppstoreOutlined,
   LinkOutlined,
@@ -7,8 +8,13 @@ import {
 } from "@ant-design/icons";
 import logo from "../static/logo.png";
 
-export default class ABBMenu extends Component {
-  state = { current: "3" };
+export default class Nav extends Component {
+  state = { current: null};
+
+  componentDidMount(){
+      const y=window.location.pathname.split('/');
+      this.setState({current:y[1]});
+  }
 
   handleClick = (e) => {
     console.log("click ", e);
@@ -24,10 +30,10 @@ export default class ABBMenu extends Component {
         mode="horizontal"
         selectedKeys={[this.state.current]}
       >
-        <Menu.Item key="1" disabled>
+        <Menu.Item>
           <img className="logo" src={logo} alt="ABB logo" />
         </Menu.Item>
-        <Menu.Item key="2" disabled>
+        <Menu.Item>
           <Title
             level={2}
             style={{
@@ -42,14 +48,16 @@ export default class ABBMenu extends Component {
         </Menu.Item>
         {this.props.login && (
           <>
-            <Menu.Item key="3" icon={<AppstoreOutlined />}>
-              Clients
+            <Menu.Item key="" icon={<AppstoreOutlined />}>
+              <Link to="/">Clients</Link>
             </Menu.Item>
-            <Menu.Item key="4" icon={<ApartmentOutlined />}>
-              Harmonize
+            <Menu.Item key="harmonize" icon={<ApartmentOutlined />}>
+              
+              <Link to="/harmonize">Harmonize</Link>
             </Menu.Item>
-            <Menu.Item key="5" icon={<LinkOutlined />}>
-              Drives
+            <Menu.Item key="drives" icon={<LinkOutlined />}>
+              
+              <Link to="/drives">Drives</Link>
             </Menu.Item>
             <Menu.Item key="6" onClick={this.props.logOut}>
               <Divider
