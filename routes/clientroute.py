@@ -38,8 +38,10 @@ def clientList():
     thisList = []
     for x in result:
         resultstr = JSONEncoder().encode(x)
+        res = json.loads(resultstr)
+        print(res)
         #resultstr = resultstr.replace('\\',"")
-        thisList.append(resultstr)
+        thisList.append(res)
     #print(thisList)
     return {"code":2,"message":"Successful","clients":thisList}
      
