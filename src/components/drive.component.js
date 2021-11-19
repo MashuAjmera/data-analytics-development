@@ -35,7 +35,7 @@ export default class Drive extends Component {
         bordered={false}
       >
         {this.props.properties.map((property) => (
-          <p>
+          <p key={property.id}>
             {property.name}: {property.value}
           </p>
         ))}
