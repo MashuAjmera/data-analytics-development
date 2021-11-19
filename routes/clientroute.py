@@ -68,9 +68,8 @@ def clientByid(id):
     collection = db[collectionname]
     resultraw = collection.find_one({"_id":ObjectId(id)})
     result = JSONEncoder().encode(resultraw)
-    return {"code":2,"message":"Success","client":result}
-
-
+    res = json.loads(result)
+    return {"code":2,"message":"Success","client":res}
 
 def insert(request):
     client={
@@ -80,11 +79,11 @@ def insert(request):
             "protocol":{
                 "id":drive['protocol']['id'],
                 "properties":[{
-                    "name": prop['name'],
+                    "id": prop['id'],
                     "value": prop['value']
                 } for prop in drive['protocol']['properties']]
             },
-            "parameters":[pid for pid in drive['parameters']]
+            "parameters":[{"id":p.id,"interval":p.interval} for p in drive['parameters']]
         } for drive in request.drives],
         "endpoints":[{
             "id":ep['id'],
