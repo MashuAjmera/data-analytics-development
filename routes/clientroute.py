@@ -102,7 +102,7 @@ def clientByid(id):
     else:
         return 'Unauthorised Access',400
 
-@client_route_blueprint.route("/adddrive", methods = ["GET"])
+@client_route_blueprint.route("/adddrive", methods = ["GET","POST"])
 def clientAddDrive():
     author = request.headers.get('Authorization')
     try:
@@ -148,7 +148,7 @@ def clientAddEndpoint():
         resp = json.loads(result1)
         thisList = resp['endpoints']
         thisList.append(endpoint)
-        resultraw = collection.find_one_and_update({'_id':ObjectId(clientid)},{ '$set': { "drives" : thisList}}, return_document = ReturnDocument.AFTER)
+        resultraw = collection.find_one_and_update({'_id':ObjectId(clientid)},{ '$set': { "endpoints" : thisList}}, return_document = ReturnDocument.AFTER)
         result = JSONEncoder().encode(resultraw)
         resp = json.loads(result)
         
