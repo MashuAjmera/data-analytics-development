@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import {
   Collapse,
-  Skeleton,
+  Spin,
   Button,
   PageHeader,
   Typography,
@@ -22,12 +22,11 @@ export default class Clients extends Component {
   };
 
   componentDidMount() {
-    const token =
-      "gAAAAABhZnwaPs6apOa89Ck12PA1ZLq7TNq77qIYvWK7O5f6gDK8BuENXZy8x8hQ7_UzSUzGAuCROXKhHAw3l-gBNM6rXDIg8w==";
-    this.setState({ token },this.showClients);
+    const token =localStorage.getItem("Authorization");
+    this.setState({ token }, this.showClients);
   }
-  
-  showClients=()=>{
+
+  showClients = () => {
     this.setState({ loadClients: true });
     // FETCH GET /api/clients/ <- all client names
     fetch("/api/clients/", {
@@ -44,15 +43,30 @@ export default class Clients extends Component {
     //     { id: "5678", name: "oemclient" },
     //   ],
     // });
-  }
+  };
 
   createClient = (value) => {
     this.setState({ createClientLoading: true });
     // FETCH POST /api/clients/add -> create a blank client
-    this.setState({
-      clients: [...this.state.clients, { id: "4567", name: value }],
-    });
-    this.setState({ createClientLoading: false });
+    fetch("/api/clients/add", {
+      method: 'POST',
+      headers: {
+        Authorization: this.state.token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name: value }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        this.setState({ createClientLoading: false });
+        message.success("Client Created Successfully.");
+        this.showClients();
+      })
+      .catch((error) => message.warning({ content: error }));
+    // this.setState({
+    //   clients: [...this.state.clients, { id: "4567", name: value }],
+    // });
+    // this.setState({ createClientLoading: false });
   };
 
   render() {
@@ -90,19 +104,18 @@ export default class Clients extends Component {
             </Popover>,
           ]}
         />
-        <Skeleton loading={this.state.loadClients} active paragraph={{width: "100%", rows: 4}} title={false} >
-        {this.state.clients.length >= 1 ? (
-          <Collapse accordion bordered={false}>
-            {this.state.clients.map((client) => (
-              <Panel header={client.name} key={client.id} extra={genExtra()}>
-                <Client id={client.id} user={this.props.user} />
-              </Panel>
-            ))}
-          </Collapse>
-        ) : (
-          <Empty description={<span>No client created yet!</span>}/>
-        )}
-        </Skeleton>
+          {this.state.loadClients?<div className="example"><Spin size="large" /></div>:this.state.clients.length >= 1 ? (
+            <Collapse accordion bordered={false}>
+              {this.state.clients.map((client) => (
+                <Panel header={client.name} key={client._id} extra={genExtra()}>
+                  <Client id={client._id} user={this.props.user} />
+                </Panel>
+              ))}
+            </Collapse>
+          ) : (
+            <Empty description={<span>No client created yet!</span>} />
+          )}
+        
       </>
     );
   }

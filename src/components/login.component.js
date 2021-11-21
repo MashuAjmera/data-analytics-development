@@ -58,7 +58,6 @@ export default class Configure extends Component {
         >
           <Input />
         </Form.Item>
-  
         <Form.Item
           label="Password"
           name="password"
@@ -71,7 +70,6 @@ export default class Configure extends Component {
         >
           <Input.Password />
         </Form.Item>
-  
         <Form.Item
           wrapperCol={{
             offset: 8,

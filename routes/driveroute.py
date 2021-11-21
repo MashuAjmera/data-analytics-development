@@ -97,7 +97,7 @@ def createDrive():
 def insert(request):
     drive={
         "name": request.name,
-        "parameters":[{"id":'',"name": p['name'],"unit":p['unit'],"type": p["type"]} for p in request.parameters],
+        "parameters":[{"id":'',"name": p['name'],"unit":p['unit'],"type": p["type"],"alias":p['name'], "interval":p["interval"]} for p in request.parameters],
         "protocols":[id for id in request.protocols],
     }
     #model.drives.insert(drive)

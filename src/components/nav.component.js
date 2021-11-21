@@ -30,15 +30,15 @@ export default class Nav extends Component {
         mode="horizontal"
         selectedKeys={[this.state.current]}
       >
-        <Menu.Item>
+        <Menu.Item key="1">
           <img className="logo" src={logo} alt="ABB logo" />
         </Menu.Item>
-        <Menu.Item>
+        <Menu.Item key="2">
           <Title
             level={2}
             style={{
               color: "#dddddd",
-              width: "60vw",
+              width: "calc(100vw - 750px)",
               marginTop: "10px",
               marginBottom: "10px",
             }}
