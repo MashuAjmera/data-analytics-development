@@ -6,11 +6,13 @@ from flask import Blueprint
 from cryptography.fernet import Fernet
 from bson.objectid import ObjectId
 import json
+from routes.userroute import authorisationcheck
+
 
 drive_route_blueprint = Blueprint('drive_route_blueprint', __name__)
 
 clusterurl = "mongodb+srv://Ashwin:Hackathonmongo@ashwinhackathon.u0vht.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
-dbname = "driveData"
+dbname = "informationModel"
 collectionname = "drives"
 
 class JSONEncoder(json.JSONEncoder):
@@ -21,25 +23,75 @@ class JSONEncoder(json.JSONEncoder):
 
 @drive_route_blueprint.route("/", methods = ["GET"])
 def driveList():
-    cluster = mongo_client.MongoClient(clusterurl)
-    db = cluster[dbname]
-    collection = db[collectionname]
-    result = collection.find({},{ "_id": 1, "name": 1})
-    thisList = []
-    for x in result:
-        resultstr = JSONEncoder().encode(x)
-        #resultstr = resultstr.replace('\\',"")
-        thisList.append(resultstr)
-    return {"code":2,"message":"Successful","drives":thisList}
+    author = request.headers.get('Authorization')
+    try:
+        user = authorisationcheck(author)
+    except:
+        return 'Invalid Token',400
+    if user == 'admin' or user == 'developer':
+        cluster = mongo_client.MongoClient(clusterurl)
+        db = cluster[dbname]
+        collection = db[collectionname]
+        result = collection.find({},{ "_id": 1, "name": 1})
+        thisList = []
+        for x in result:
+            resultstr = JSONEncoder().encode(x)
+            res = json.loads(resultstr)
+            #print(res)
+            #resultstr = resultstr.replace('\\',"")
+            thisList.append(res)
+        resp = {"drives":thisList}
+        return resp,200
+    else:
+        return 'Unauthorised Access',400
 
 @drive_route_blueprint.route("/<id>", methods = ["GET"])
 def clientByid(id):
-    cluster = mongo_client.MongoClient(clusterurl)
-    db = cluster[dbname]
-    collection = db[collectionname]
-    resultraw = collection.find_one({"_id":ObjectId(id)})
-    result = JSONEncoder().encode(resultraw)
-    return {"code":2,"message":"Success","drive":result}
+    author = request.headers.get('Authorization')
+    try:
+        user = authorisationcheck(author)
+    except:
+        return 'Invalid Token',400
+    if user == 'admin' or user == 'developer':
+        cluster = mongo_client.MongoClient(clusterurl)
+        db = cluster[dbname]
+        collection = db[collectionname]
+        resultraw = collection.find_one({"_id":ObjectId(id)})
+        result = JSONEncoder().encode(resultraw)
+        resp = json.loads(result)
+        protocolIdList = resp['protocols']
+        collectionProtocol = db['protocols']
+        protocolList = []
+        for x in protocolIdList:
+            resultprotocol = collectionProtocol.find_one({"_id":ObjectId(x['_id'])})
+            resultprotocol1 = JSONEncoder().encode(resultprotocol)
+            resultprotocol2 = json.loads(resultprotocol1)
+            protocolList.append(resultprotocol2)
+        updatedict = {
+            "protocols":protocolList
+        }
+        for sub in resp:
+            if sub in updatedict:
+                resp[sub]  = updatedict[sub]
+
+        return resp,200
+    else:
+        return 'Unauthorised Access',400
+
+@drive_route_blueprint.route("/createDrive", methods = ["POST"])
+def createDrive():
+    #author = request.headers.get('Authorization')
+    #try:
+    #    user = authorisationcheck(author)
+    #except:
+    #    return 'Invalid Token',400
+    #if user == 'admin' or user == 'onboarder':
+    f = request.files['file']
+    print(f.filename)
+    f.save('/home/ashwin/Desktop', f.filename)
+    return 'Successful',200
+    #else:
+    #    return 'Unauthorised Access',400
 
 
 def insert(request):

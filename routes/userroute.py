@@ -11,6 +11,8 @@ clusterurl = "mongodb+srv://Ashwin:Hackathonmongo@ashwinhackathon.u0vht.mongodb.
 dbname = "userData"
 collectionname = "users"
 
+tokenkey = None
+
 def encodepassword(password):
     key = 'wq7mKkng6_BGUVnoXTABPEuVY6qFwlVMdfLBuSp0948='
     fernet = Fernet(key.encode())
@@ -31,6 +33,30 @@ def returnExistingUser(name):
     #print(result)
     return result
 
+def authorisationcheck(token):
+    #print(key)
+    fernettok = Fernet(tokenkey)
+    #encMessage = fernet.encrypt(token.encode())
+    decMessage = fernettok.decrypt(token.encode())
+    #print(decMessage)
+    return decMessage.decode()
+
+@user_route_blueprint.before_app_first_request
+def before_first_request():
+    global tokenkey
+    tokenkey = Fernet.generate_key()
+
+@user_route_blueprint.route("/checkuser", methods = ["POST","GET"])
+def checkUser():
+    #adminstatus = False
+    author = request.headers.get('Authorization')
+    try:
+        user = authorisationcheck(author)
+        return user,200
+    except:
+        return 'Invalid Token',400
+    
+
 @user_route_blueprint.route("/login", methods = ["POST","GET"])
 def login():
     username = request.json['name']
@@ -38,11 +64,16 @@ def login():
     password = entry["password"]
     userpassword = request.json['password']
     print(decodepassword(password.encode()))
-    
+    tokenfernet = Fernet(tokenkey)
     if decodepassword(password.encode()) == userpassword :
-        return {"code":2,"message":"Login Successful","type":entry["type"]}
+        token = tokenfernet.encrypt(entry["type"].encode())
+        resp = {"type":entry["type"], "token": token.decode()}
+        return resp,200
+        #return {"code":2,"message":"Login Successful","type":entry["type"]}
     else:
-        return {"code":4,"message":"Invalid username or password"}
+        resp = 'Invalid Username or Password'
+        return resp,400
+        #return {"code":4,"message":"Invalid username or password"}
 
 @user_route_blueprint.route("/signup", methods = ["POST","GET"])
 def signup():
@@ -60,9 +91,11 @@ def signup():
     existingUserlen = len(str(returnExistingUser(request.json['name'])))
     if existingUserlen < 5:
         collection.insert_one(user)
-        return {"code":2,"message":"Signup Successful"}
+        return 'Successful',200
+        #return {"code":2,"message":"Signup Successful"}
     else:
-        return {"code":4,"message":"User already exist"}
+        return 'User already exist',400
+        #return {"code":4,"message":"User already exist"}
 
 
 
