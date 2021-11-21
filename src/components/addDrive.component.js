@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Modal, Steps, List, Button, Table, Space, Input, message, Spin } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import Sections from "./sections.component";
+import CodeEditor from '@uiw/react-textarea-code-editor';
 
 export default class AddDrive extends Component {
   state = {
@@ -13,7 +14,7 @@ export default class AddDrive extends Component {
     drive: null,
     protocol: null,
     rule:'',
-    selectedRowKeys: [],
+    selectedRowKeys: [], code:`# Modify code below\ndef rule(drive): \n\treturn drive.parameters}`
   };
 
   componentDidMount() {
@@ -161,12 +162,25 @@ export default class AddDrive extends Component {
       },
       {
         title: "Rules",
-        content: <Input.TextArea
-        value={this.state.rule}
-        onChange={this.onChange}
-        placeholder="Write rules to modify data"
-        autoSize={{ minRows: 3, maxRows: 5 }}
-      />,
+        content: 
+        <CodeEditor
+    value={this.state.code}
+    language="py"
+    placeholder="Please enter PY code."
+    onChange={(evn) => this.setState({code: evn.target.value})}
+    padding={15}
+    style={{
+      fontSize: 12,
+      backgroundColor: "#f5f5f5",
+      fontFamily: 'ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace',
+    }}
+  />
+      //   <Input.TextArea
+      //   value={this.state.rule}
+      //   onChange={this.onChange}
+      //   placeholder="Write rules to modify data"
+      //   autoSize={{ minRows: 3, maxRows: 5 }}
+      // />,
       },
     ];
     return (
