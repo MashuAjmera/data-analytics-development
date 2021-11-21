@@ -12,6 +12,7 @@ from routes.userroute import user_route_blueprint
 from routes.clientroute import client_route_blueprint
 from routes.driveroute import drive_route_blueprint
 from routes.endpointroute import endpoint_route_blueprint
+from routes.protocolroute import protocol_route_blueprint
 
 if os.environ.get("FLASK_ENV")=='development':
     from dotenv import load_dotenv
@@ -23,6 +24,7 @@ app.register_blueprint(user_route_blueprint, url_prefix="/api/users")
 app.register_blueprint(client_route_blueprint, url_prefix="/api/clients")
 app.register_blueprint(drive_route_blueprint, url_prefix="/api/drives")
 app.register_blueprint(endpoint_route_blueprint, url_prefix="/api/endpoints")
+app.register_blueprint(protocol_route_blueprint, url_prefix="/api/protocols")
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')

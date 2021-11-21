@@ -6,11 +6,13 @@ from flask import Blueprint
 from cryptography.fernet import Fernet
 from bson.objectid import ObjectId
 import json
+from routes.userroute import authorisationcheck
+from pymongo import ReturnDocument
 
 client_route_blueprint = Blueprint('client_route_blueprint', __name__)
 
 clusterurl = "mongodb+srv://Ashwin:Hackathonmongo@ashwinhackathon.u0vht.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
-dbname = "clientData"
+dbname = "userData"
 collectionname = "clients"
 
 class JSONEncoder(json.JSONEncoder):
@@ -29,47 +31,130 @@ def returnExistingclient(name):
 
 @client_route_blueprint.route("/", methods = ["GET"])
 def clientList():
-    cluster = mongo_client.MongoClient(clusterurl)
-    db = cluster[dbname]
-    collection = db[collectionname]
-    #print("request obtained")
-    result = collection.find({},{ "_id": 1, "name": 1})
-    #print(result)
-    thisList = []
-    for x in result:
-        resultstr = JSONEncoder().encode(x)
-        res = json.loads(resultstr)
-        print(res)
-        #resultstr = resultstr.replace('\\',"")
-        thisList.append(res)
-    #print(thisList)
-    return {"code":2,"message":"Successful","clients":thisList}
+    author = request.headers.get('Authorization')
+    try:
+        user = authorisationcheck(author)
+    except:
+        return 'Invalid Token',400
+    if user == 'admin' or user == 'developer':
+        
+        cluster = mongo_client.MongoClient(clusterurl)
+        db = cluster[dbname]
+        collection = db[collectionname]
+        #print("request obtained")
+        result = collection.find({},{ "_id": 1, "name": 1})
+        #print(result)
+        thisList = []
+        for x in result:
+            resultstr = JSONEncoder().encode(x)
+            res = json.loads(resultstr)
+            #print(res)
+            #resultstr = resultstr.replace('\\',"")
+            thisList.append(res)
+        #print(thisList)
+        resp = {"clients":thisList}
+        return resp,200
+    else:
+        return 'Unauthorised',400
      
 
 @client_route_blueprint.route("/add", methods = ["POST","GET"])
 def addClient():
-    cluster = mongo_client.MongoClient(clusterurl)
-    db = cluster[dbname]
-    collection = db[collectionname]
-    client = {
-        "name": request.json['name']
-    }
-    existingClientlen = len(str(returnExistingclient(request.json['name'])))
-    if existingClientlen < 5:
-        collection.insert_one(client)
-        return {"code":2,"message":"Client added successfully"}
+    author = request.headers.get('Authorization')
+    try:
+        user = authorisationcheck(author)
+    except:
+        return 'Invalid Token',400
+    if user == 'admin' or user == 'developer':
+        cluster = mongo_client.MongoClient(clusterurl)
+        db = cluster[dbname]
+        collection = db[collectionname]
+        client = {
+            "name": request.json['name'],
+            "drives":[],
+            "endpoints":[]
+        }
+        existingClientlen = len(str(returnExistingclient(request.json['name'])))
+        if existingClientlen < 5:
+            collection.insert_one(client)
+            return 'Successful',200
+        else:
+            return 'Client already exists',400
     else:
-        return {"code":4,"message":"Client already exist"}
+        return 'Unauthorised Access',400
 
 @client_route_blueprint.route("/<id>", methods = ["GET"])
 def clientByid(id):
-    cluster = mongo_client.MongoClient(clusterurl)
-    db = cluster[dbname]
-    collection = db[collectionname]
-    resultraw = collection.find_one({"_id":ObjectId(id)})
-    result = JSONEncoder().encode(resultraw)
-    res = json.loads(result)
-    return {"code":2,"message":"Success","client":res}
+    author = request.headers.get('Authorization')
+    try:
+        user = authorisationcheck(author)
+    except:
+        return 'Invalid Token',400
+
+    if user == 'admin' or user == 'developer':
+        cluster = mongo_client.MongoClient(clusterurl)
+        db = cluster[dbname]
+        collection = db[collectionname]
+        resultraw = collection.find_one({"_id":ObjectId(id)})
+        result = JSONEncoder().encode(resultraw)
+        resp = json.loads(result)
+        return resp,200
+    else:
+        return 'Unauthorised Access',400
+
+@client_route_blueprint.route("/adddrive", methods = ["GET","POST"])
+def clientAddDrive():
+    author = request.headers.get('Authorization')
+    try:
+        user = authorisationcheck(author)
+    except:
+        return 'Invalid Token',400
+
+    if user == 'admin' or user == 'developer':
+        clientid = request.json['clientId']
+        cluster = mongo_client.MongoClient(clusterurl)
+        db = cluster[dbname]
+        collection = db[collectionname]
+        drive = request.json['drive']
+        resultraw = collection.find_one({"_id":ObjectId(clientid)})
+        result1 = JSONEncoder().encode(resultraw)
+        resp = json.loads(result1)
+        thisList = resp['drives']
+        thisList.append(drive)
+        resultraw = collection.find_one_and_update({'_id':ObjectId(clientid)},{ '$set': { "drives" : thisList}}, return_document = ReturnDocument.AFTER)
+        result = JSONEncoder().encode(resultraw)
+        resp = json.loads(result)
+        
+        return resp,200
+    else:
+        return 'Unauthorised Access',400
+
+@client_route_blueprint.route("/addendpoint", methods = ["GET"])
+def clientAddEndpoint():
+    author = request.headers.get('Authorization')
+    try:
+        user = authorisationcheck(author)
+    except:
+        return 'Invalid Token',400
+
+    if user == 'admin' or user == 'developer':
+        clientid = request.json['clientId']
+        cluster = mongo_client.MongoClient(clusterurl)
+        db = cluster[dbname]
+        collection = db[collectionname]
+        endpoint = request.json['endpoint']
+        resultraw = collection.find_one({"_id":ObjectId(clientid)})
+        result1 = JSONEncoder().encode(resultraw)
+        resp = json.loads(result1)
+        thisList = resp['endpoints']
+        thisList.append(endpoint)
+        resultraw = collection.find_one_and_update({'_id':ObjectId(clientid)},{ '$set': { "endpoints" : thisList}}, return_document = ReturnDocument.AFTER)
+        result = JSONEncoder().encode(resultraw)
+        resp = json.loads(result)
+        
+        return resp,200
+    else:
+        return 'Unauthorised Access',400
 
 def insert(request):
     client={
@@ -79,11 +164,11 @@ def insert(request):
             "protocol":{
                 "id":drive['protocol']['id'],
                 "properties":[{
-                    "id": prop['id'],
+                    "name": prop['name'],
                     "value": prop['value']
                 } for prop in drive['protocol']['properties']]
             },
-            "parameters":[{"id":p.id,"interval":p.interval} for p in drive['parameters']]
+            "parameters":[pid for pid in drive['parameters']]
         } for drive in request.drives],
         "endpoints":[{
             "id":ep['id'],
