@@ -1,13 +1,15 @@
 import React, { Component } from "react";
-import { Modal, Steps, List, Button, Table, Space, Input } from "antd";
+import { Modal, Steps, List, Button, Table, Space, Input, message, Spin } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import Sections from "./sections.component";
 
 export default class AddDrive extends Component {
   state = {
     driveModal: false,
+    token:null,
     current: 0,
     drives: [],
+    loadNext:false,
     drive: null,
     protocol: null,
     rule:'',
@@ -15,13 +17,23 @@ export default class AddDrive extends Component {
   };
 
   componentDidMount() {
+    const token =localStorage.getItem("Authorization");
+    this.setState({ token }, ()=>
     // FETCH name of all the drives GET /api/drives
-    this.setState({
-      drives: [
-        { name: "ACS880", id: "1234" },
-        { name: "ACS800", id: "56798" },
-      ],
-    });
+    fetch("/api/drives/", {
+      headers: { Authorization: this.state.token },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        this.setState({ loadClients: false, drives: data.drives });
+      })
+      .catch((error) => message.warning({ content: error })));
+    // this.setState({
+    //   drives: [
+    //     { name: "ACS880", id: "1234" },
+    //     { name: "ACS800", id: "56798" },
+    //   ],
+    // });
   }
 
   changeDriveModal = () => {
@@ -37,29 +49,38 @@ export default class AddDrive extends Component {
     this.setState({ current });
   };
 
-  handleClick = (e) => {
-    let data = [];
-    for (let i = 0; i < 46; i++) {
-      data.push({
-        key: i,
-        name: `Analog Input ${i}`,
-        unit: 'kmph',
-        type: 'uint',
-        interval: 1000,
-      });
-    }
-    this.setState({
-      drive: {
-        name: "ACS880",
-        id: "1234",
-        protocols: [
-          { id: "123", name: "ModBus" },
-          { id: "456", name: "OPCUA" },
-        ],
-        parameters:data
-      },
-      current: 1,
-    });
+  handleClick = (id) => {
+    this.setState({loadNext:true, current: 1})
+    fetch(`/api/drives/${id}`, {
+      headers: { Authorization: this.state.token },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        this.setState({ drive: data.drive, loadNext:false });
+      })
+      .catch((error) => message.warning({ content: error }));
+    // let data = [];
+    // for (let i = 0; i < 46; i++) {
+    //   data.push({
+    //     key: i,
+    //     name: `Analog Input ${i}`,
+    //     unit: 'kmph',
+    //     type: 'uint',
+    //     interval: 1000,
+    //   });
+    // }
+    // this.setState({
+    //   drive: {
+    //     name: "ACS880",
+    //     id: "1234",
+    //     protocols: [
+    //       { id: "123", name: "ModBus" },
+    //       { id: "456", name: "OPCUA" },
+    //     ],
+    //     parameters:data
+    //   },
+    //   current: 1,
+    // });
   };
 
   onSelectChange = (selectedRowKeys) => {
@@ -101,24 +122,22 @@ export default class AddDrive extends Component {
     const steps = [
       {
         title: "Drive",
-        content: (
-          <List
+        content: <List
             size="small"
             dataSource={this.state.drives}
             renderItem={(item) => (
-              <List.Item>
-                <Button onClick={() => this.handleClick(item.id)} type="text">
+              <List.Item key={item._id}>
+                <Button onClick={() => this.handleClick(item._id)} type="text">
                   {item.name}
                 </Button>
               </List.Item>
             )}
-          />
-        ),
+            />,
       },
       {
         title: "Protocol",
-        content: this.state.drive && (
-          <Sections sections={this.state.drive.protocols} sname="drive" />
+        content: this.state.loadNext ? <div className="example"><Spin size="large" /></div> : this.state.drive && (
+          <Sections sections={this.state.drive.protocols} sname="protocols" />
         ),
       },
       {
@@ -158,6 +177,7 @@ export default class AddDrive extends Component {
           onOk={this.changeDriveModal}
           onCancel={this.changeDriveModal}
           width={700}
+          okText="Add"
         >
           <Steps current={this.state.current} onChange={this.changeCurrent}>
             {steps.map((item) => (

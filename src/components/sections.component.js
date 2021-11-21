@@ -1,12 +1,27 @@
 import React, { Component } from "react";
-import { Select, Form, Input, Spin } from "antd";
+import { Select, Form, Input, Spin , message} from "antd";
 
 export default class Sections extends Component {
-  state = { section: null, load: false };
+  state = { section: null, load: false, token:null };
+
+  componentDidMount() {
+    const token = localStorage.getItem("Authorization");
+    this.setState({ token },this.getClient);
+  }
 
   handleChange = (id) => {
+
     this.setState({ load: true });
     // FETCH GET /api/${this.props.sname}/id <- get all properties of endpoint
+    // fetch(`/api/${this.props.sname}/${id}`, {
+    //   headers: { Authorization: this.state.token },
+    // })
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     console.log(data);
+    //     this.setState({ section: data[this.props.sname],current:1 });
+    //   })
+    //   .catch((error) => message.warning({ content: error }));
     this.setState({
       section: {
         name: "hi",
@@ -51,7 +66,7 @@ export default class Sections extends Component {
           >
             <Select
               showSearch
-              placeholder={`Select ${this.props.sname} to Add`}
+              placeholder={`Select one of the ${this.props.sname} to add`}
               style={{ width: "100%" }}
               optionFilterProp="children"
               filterOption={(input, option) =>
@@ -60,7 +75,7 @@ export default class Sections extends Component {
               onChange={this.handleChange}
             >
               {this.props.sections.map((section) => (
-                <Select.Option key={section.id} value={section.id}>
+                <Select.Option key={section._id} value={section._id}>
                   {section.name}
                 </Select.Option>
               ))}
