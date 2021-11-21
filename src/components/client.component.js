@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { Row, Col, Divider, Button, Empty, message, Spin } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { Row, Col, Divider, Empty, message, Spin } from "antd";
 import Endpoint from "./endpoint.component";
 import Drive from "./drive.component";
 import AddDrive from "./addDrive.component";
@@ -58,7 +57,7 @@ export default class Client extends Component {
             </Divider>
           </Col>
         </Row>
-        {this.state.client.endpoints ? (
+        {this.state.client.endpoints.length>=1 ? (
           <Row gutter={16}>
             {this.state.client.endpoints.map((endpoint) => (
               <Col span={5}>
@@ -84,7 +83,7 @@ export default class Client extends Component {
             </Divider>
           </Col>
         </Row>
-        {this.state.client.drives ? (
+        {this.state.client.drives.length>=1 ? (
           <Row gutter={16}>
             {this.state.client.drives.map((drive) => (
               <Col span={5}>
