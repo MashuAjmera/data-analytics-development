@@ -102,7 +102,7 @@ def clientByid(id):
     else:
         return 'Unauthorised Access',400
 
-@client_route_blueprint.route("/addDrive", methods = ["GET"])
+@client_route_blueprint.route("/adddrive", methods = ["GET"])
 def clientAddDrive():
     author = request.headers.get('Authorization')
     try:
@@ -129,7 +129,7 @@ def clientAddDrive():
     else:
         return 'Unauthorised Access',400
 
-@client_route_blueprint.route("/addEndpoint", methods = ["GET"])
+@client_route_blueprint.route("/addendpoint", methods = ["GET"])
 def clientAddEndpoint():
     author = request.headers.get('Authorization')
     try:
