@@ -46,7 +46,7 @@ def driveList():
         return 'Unauthorised Access',400
 
 @drive_route_blueprint.route("/<id>", methods = ["GET"])
-def clientByid(id):
+def drivebyId(id):
     author = request.headers.get('Authorization')
     try:
         user = authorisationcheck(author)

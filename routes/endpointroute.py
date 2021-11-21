@@ -20,6 +20,14 @@ class JSONEncoder(json.JSONEncoder):
             return str(o)
         return json.JSONEncoder.default(self, o)
 
+def returnExistingendpoint(name):
+    cluster = mongo_client.MongoClient(clusterurl)
+    db = cluster[dbname]
+    collection = db[collectionname]
+    result = collection.find_one({"name":name})
+    #print(result)
+    return result
+
 @endpoint_route_blueprint.route("/", methods = ["GET"])
 def endpointList():
     author = request.headers.get('Authorization')
@@ -48,8 +56,48 @@ def endpointList():
     else:
         return 'Unauthorised',400
 
+@endpoint_route_blueprint.route("/createendpoint", methods = ["POST","GET"])
+def createEndpoint():
+    author = request.headers.get('Authorization')
+    try:
+        user = authorisationcheck(author)
+    except:
+        return 'Invalid Token',400
+    if user == 'admin' or user == 'onboarder':
+        cluster = mongo_client.MongoClient(clusterurl)
+        db = cluster[dbname]
+        collection = db[collectionname]
+        properties = []
+        property1 = {
+            "_id":"e_01",
+            "name":"url"
+        }
+        property2 = {
+            "_id":"e_02",
+            "name":"username"
+        }
+        property3 = {
+            "_id":"e_03",
+            "name":"password"
+        }
+        properties.append(property1)
+        properties.append(property2)
+        properties.append(property3)
+        endpoint = {
+        "name": request.json['name'],
+        "properties":properties
+        }
+        existingClientlen = len(str(returnExistingendpoint(request.json['name'])))
+        if existingClientlen < 5:
+            collection.insert_one(endpoint)
+            return 'Successful',200
+        else:
+            return 'Endpoint already exists',400
+    else:
+        return 'Unauthorised Access',400
+
 @endpoint_route_blueprint.route("/<id>", methods = ["GET"])
-def clientByid(id):
+def endpointbyId(id):
     author = request.headers.get('Authorization')
     try:
         user = authorisationcheck(author)
