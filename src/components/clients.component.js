@@ -58,8 +58,8 @@ export default class Clients extends Component {
     })
       .then((response) => response.json())
       .then((data) => {
-        this.setState({ createClientLoading: false });
         message.success("Client Created Successfully.");
+        this.setState({ createClientLoading: false });
         this.showClients();
       })
       .catch((error) => message.warning({ content: error }));

@@ -52,8 +52,7 @@ def clientList():
             #resultstr = resultstr.replace('\\',"")
             thisList.append(res)
         #print(thisList)
-        resp = {"clients":thisList}
-        return resp,200
+        return {"clients":thisList},200
     else:
         return 'Unauthorised',400
      
@@ -98,7 +97,7 @@ def clientByid(id):
         resultraw = collection.find_one({"_id":ObjectId(id)})
         result = JSONEncoder().encode(resultraw)
         resp = json.loads(result)
-        return resp,200
+        return {"client": resp},200
     else:
         return 'Unauthorised Access',400
 

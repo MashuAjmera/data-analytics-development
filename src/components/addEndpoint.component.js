@@ -1,12 +1,23 @@
 import React, { Component } from "react";
-import { Button, Modal } from "antd";
+import { Button, Modal, message  } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import Sections from "./sections.component";
 
 export default class AddEndpoint extends Component {
-  state = { modal: false, endpoints: null, endpoint: null, loadEndpoint:false };
+  state = { modal: false, endpoints: null, endpoint: null, token:null, loadEndpoint:false };
 
   componentDidMount() {
+    // const token =localStorage.getItem("Authorization");
+    // this.setState({ token }, ()=>
+    // FETCH name of all the drives GET /api/drives
+    // fetch("/api/endpoints/", {
+    //   headers: { Authorization: this.state.token },
+    // })
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     this.setState({ loadEndpoint: false, endpoints: data.endpoints });
+    //   })
+    //   .catch((error) => message.warning({ content: error })));
     // FETCH GET /api/endpoints <- name and id of all endpoints
     this.setState({
       endpoints: [
@@ -35,7 +46,7 @@ export default class AddEndpoint extends Component {
           okText="Add"
           onCancel={this.onCancel}
         >
-          {this.state.endpoints && <Sections sections={this.state.endpoints} sname="endpoint"/>}
+          {this.state.endpoints && <Sections sections={this.state.endpoints} sname="endpoints"/>}
         </Modal>
         <Button icon={<PlusOutlined />} onClick={this.changeDriveModal}>
           Add Endpoint

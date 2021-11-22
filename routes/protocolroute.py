@@ -8,7 +8,7 @@ from bson.objectid import ObjectId
 import json
 from routes.userroute import authorisationcheck
 
-protocol_route_blueprint = Blueprint('endpoint_route_blueprint', __name__)
+protocol_route_blueprint = Blueprint('protocol_route_blueprint', __name__)
 
 clusterurl = "mongodb+srv://Ashwin:Hackathonmongo@ashwinhackathon.u0vht.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
 dbname = "informationModel"
