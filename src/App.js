@@ -14,30 +14,32 @@ export default class App extends Component {
   state = { login: false, user: {} };
 
   componentDidMount() {
-    let token = localStorage.getItem("Authorization");
+    const token = localStorage.getItem("Authorization");
     if(token){
-      this.setState({user:{admin:true},login:true})
-      // fetch('/api/users/checkuser', {
-      //   headers: { "Authorization": token },
-      // })
-      //   .then(response => response.json())
-      //   .then((data) => {
-      //     if(data.code===2){
-      //       this.setLogin(data.admin);
-      //     }
-      //   }).catch(error => message.warning({ content: error }));
+      fetch('/api/users/checkuser', {
+        headers: { "Authorization": token },
+      })
+        .then(response => {
+          if(response.ok){
+            return response.json();
+          }else {
+            throw new Error("Something went wrong");
+          }
+        }).then(data=>this.setLogin(data))
+        .catch(error => message.warning({ content: error }));
     }
   }
 
   logOut = (e) => {
     localStorage.removeItem("Authorization");
-    this.setState({ user: [], login: false });
+    this.setState({ user: {}, login: false });
     window.location.reload();
     message.success({ content: "Logged Out Successfully!" });
   };
 
-  setLogin = (admin) => {
-    this.setState({ login: !this.state.login, user: { admin } });
+  setLogin = (data) => {
+    localStorage.setItem("Authorization", data.token);
+    this.setState({ login: true, user:{type:data.type}});
   };
   
   render() {
