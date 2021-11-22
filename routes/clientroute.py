@@ -117,11 +117,7 @@ def clientByid(id):
             driveListItem = {
                 "_id":drive['_id'],
                 "name":resultdrive2['name'],
-                "protocol":{
-                    "_id":resultprotocol2['_id'],
-                    "name":resultprotocol2['name']
-                },
-                "datapoints":datapointsize
+                "properties":[{"protocol":resultprotocol2['name']},{"datapoints":datapointsize}]
             }
             driveList.append(driveListItem)
         
@@ -129,11 +125,18 @@ def clientByid(id):
             resultendpoint = collectionEndpoint.find_one({"_id":ObjectId(endpoint['_id'])})
             resultendpoint1 = JSONEncoder().encode(resultendpoint)
             resultendpoint2 = json.loads(resultendpoint1)
+            propertiesList = []
+            for prop in endpoint['properties']:
+                for proper in resultendpoint2['properties']:
+                    if prop['_id'] == proper['_id']:
+                        propertiesListItem = {"_id":prop['_id'],"name":proper['name'],"value":prop['value']}
+                        propertiesList.append(propertiesListItem)
+                        break
             #print(resultendpoint2)
             endpointListItem = {
                 "_id":resultendpoint2['_id'],
                 "name":resultendpoint2['name'],
-                "properties":endpoint['properties']
+                "properties":propertiesList
             }
             endpointList.append(endpointListItem)
 
