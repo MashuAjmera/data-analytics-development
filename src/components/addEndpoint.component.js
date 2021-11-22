@@ -7,29 +7,47 @@ export default class AddEndpoint extends Component {
   state = { modal: false, endpoints: null, endpoint: null, token:null, loadEndpoint:false };
 
   componentDidMount() {
-    // const token =localStorage.getItem("Authorization");
-    // this.setState({ token }, ()=>
-    // FETCH name of all the drives GET /api/drives
-    // fetch("/api/endpoints/", {
-    //   headers: { Authorization: this.state.token },
-    // })
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     this.setState({ loadEndpoint: false, endpoints: data.endpoints });
-    //   })
-    //   .catch((error) => message.warning({ content: error })));
+    const token =localStorage.getItem("Authorization");
     // FETCH GET /api/endpoints <- name and id of all endpoints
-    this.setState({
-      endpoints: [
-        { id: "123", name: "hello" },
-        { id: "456", name: "hey" },
-      ],
-    });
+    if( token){
+    fetch("/api/endpoints/", {
+      headers: { Authorization: token },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        this.setState({ loadEndpoint: false, endpoints: data.endpoints });
+      })
+      .catch((error) => message.warning(error));
+    // this.setState({
+    //   endpoints: [
+    //     { id: "123", name: "hello" },
+    //     { id: "456", name: "hey" },
+    //   ],
+    // });
+    }
   }
 
   changeDriveModal = () => {
     this.setState({ modal: !this.state.modal });
   };
+
+  onOk=()=>{
+    fetch("/api/client/addendpoint", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      // body: JSON.stringify(values),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+      })
+      .then((data) => {
+        this.changeDriveModal();
+        message.success("Logged In Successfully!");
+      })
+      .catch((error) => message.warning({ content: error }));
+  }
 
   onCancel=()=>{
     this.changeDriveModal();
