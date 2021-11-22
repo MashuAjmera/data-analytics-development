@@ -7,6 +7,7 @@ from cryptography.fernet import Fernet
 from bson.objectid import ObjectId
 import json
 from routes.userroute import authorisationcheck
+from pymongo import ReturnDocument
 
 
 drive_route_blueprint = Blueprint('drive_route_blueprint', __name__)
@@ -92,6 +93,38 @@ def createDrive():
     return 'Successful',200
     #else:
     #    return 'Unauthorised Access',400
+
+@drive_route_blueprint.route("/<id>/parameters/<paramid>", methods = ["PUT"])
+def editdriveparameter(id,paramid):
+    author = request.headers.get('Authorization')
+    try:
+        user = authorisationcheck(author)
+    except:
+        return 'Invalid Token',400
+    if user == 'governer' or user == 'admin':
+        paramname = request.json['name']
+        cluster = mongo_client.MongoClient(clusterurl)
+        db = cluster[dbname]
+        collection = db[collectionname]
+        resultraw = collection.find_one({"_id":ObjectId(id)})
+        result = JSONEncoder().encode(resultraw)
+        resp = json.loads(result)
+        parameterList = []
+        for parameter in resp['parameters']:
+            if paramid == parameter['_id']:
+                param = {
+                    "_id": parameter['_id'],
+                    "name":paramname,
+                    "unit":parameter['unit']
+                }
+                parameterList.append(param)
+            else:
+                parameterList.append(parameter)
+        resultraw = collection.find_one_and_update({'_id':ObjectId(id)},{ '$set': { "parameters" : parameterList}}, return_document = ReturnDocument.AFTER)
+
+        return 'Successfully Updated',200
+    else:
+        return 'Unauthorised Access',400
 
 
 def insert(request):
