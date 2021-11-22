@@ -34,9 +34,9 @@ export default class Drive extends Component {
         }}
         bordered={false}
       >
-        {this.props.properties.map((property) => (
-          <p key={property.id}>
-            {property.name}: {property.value}
+        {this.props.parameters.map((parameter) => (
+          <p key={parameter._id}>
+            {parameter._id}: {parameter.interval}
           </p>
         ))}
       </Card>

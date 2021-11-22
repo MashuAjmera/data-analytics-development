@@ -1,29 +1,32 @@
 import React, { Component } from "react";
-import { Typography, Button, message, Form, Input} from 'antd';
+import { Typography, Button, message, Form, Input } from "antd";
 
 export default class Configure extends Component {
-  state={loading:false}
+  state = { loading: false };
 
   onFinish = (values) => {
-    this.setState({loading:true});
-    fetch('/api/users/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(values)
-    }).then(response => response.json())
-      .then(data => {
-        if(data.code===2){
-          localStorage.setItem("Authorization", data.token);
-          this.props.setLogin(data.admin);
-          this.setState({loading:false});
-          message.success(data.message);
-        } else message.warning({content: data.message});
+    this.setState({ loading: true });
+    fetch("/api/users/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(values),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
       })
-      .catch(error => message.warning({ content: error }));
+      .then((data) => {
+        console.log(data);
+        this.props.setLogin(data);
+        this.setState({ loading: false });
+        message.success("Logged In Successfully!");
+      })
+      .catch((error) => message.warning({ content: error }));
   };
 
   onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
+    console.log("Failed:", errorInfo);
   };
 
   render() {
@@ -45,14 +48,14 @@ export default class Configure extends Component {
         onFinishFailed={this.onFinishFailed}
         autoComplete="off"
       >
-      <Title style={{ textAlign: "center" }}>SignIn to Continue</Title>
+        <Title style={{ textAlign: "center" }}>SignIn to Continue</Title>
         <Form.Item
           label="Username"
           name="name"
           rules={[
             {
               required: true,
-              message: 'Please input your username!',
+              message: "Please input your username!",
             },
           ]}
         >
@@ -64,7 +67,7 @@ export default class Configure extends Component {
           rules={[
             {
               required: true,
-              message: 'Please input your password!',
+              message: "Please input your password!",
             },
           ]}
         >

@@ -22,27 +22,29 @@ export default class Clients extends Component {
   };
 
   componentDidMount() {
-    const token =localStorage.getItem("Authorization");
-    this.setState({ token }, this.showClients);
+    this.showClients();
   }
 
   showClients = () => {
-    this.setState({ loadClients: true });
-    // FETCH GET /api/clients/ <- all client names
-    fetch("/api/clients/", {
-      headers: { Authorization: this.state.token },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        this.setState({ loadClients: false, clients: data.clients });
+    const token =localStorage.getItem("Authorization");
+    if(token){
+      this.setState({ loadClients: true });
+      // FETCH GET /api/clients/ <- all client names
+      fetch("/api/clients/", {
+        headers: { Authorization: token },
       })
-      .catch((error) => message.warning({ content: error }));
-    // this.setState({
-    //   clients: [
-    //     { id: "1234", name: "cmdclient" },
-    //     { id: "5678", name: "oemclient" },
-    //   ],
-    // });
+        .then((response) => response.json())
+        .then((data) => {
+          this.setState({ loadClients: false, clients: data.clients });
+        })
+        .catch((error) => message.warning({ content: error }));
+      // this.setState({
+      //   clients: [
+      //     { id: "1234", name: "cmdclient" },
+      //     { id: "5678", name: "oemclient" },
+      //   ],
+      // });
+    }
   };
 
   createClient = (value) => {

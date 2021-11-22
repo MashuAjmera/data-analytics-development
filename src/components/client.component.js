@@ -9,8 +9,7 @@ export default class Client extends Component {
   state = { client: {}, loadClient: true, token: null, xyz: null };
 
   componentDidMount() {
-    const token = localStorage.getItem("Authorization");
-    this.setState({ token },this.getClient);
+    this.getClient();
     // this.setState({
     //   client: {
     //     id: "1234",
@@ -32,17 +31,19 @@ export default class Client extends Component {
   }
 
   getClient = () => {
-    this.setState({ loadClient: true });
-    // FETCH client information using client id GET /api/clients/<id>
-    fetch(`/api/clients/${this.props.id}`, {
-      headers: { Authorization: this.state.token },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        this.setState({ loadClient: false, client: data.client });
+    const token = localStorage.getItem("Authorization");
+    if (token){
+      this.setState({ loadClient: true });
+      // FETCH client information using client id GET /api/clients/<id>
+      fetch(`/api/clients/${this.props.id}`, {
+        headers: { Authorization: token },
       })
-      .catch((error) => message.warning({ content: error }));
+        .then((response) => response.json())
+        .then((data) => {
+          this.setState({ loadClient: false, client: data.client });
+        })
+        .catch((error) => message.warning({ content: error }));
+    }
   };
 
   render() {
@@ -53,7 +54,7 @@ export default class Client extends Component {
           </Col>
           <Col span={12}>
             <Divider orientation="right">
-              <AddEndpoint />
+              <AddEndpoint clientId={this.props.id}/>
             </Divider>
           </Col>
         </Row>
@@ -88,9 +89,9 @@ export default class Client extends Component {
             {this.state.client.drives.map((drive) => (
               <Col span={5}>
                 <Drive
-                  id={drive.id}
-                  properties={drive.properties}
-                  key={drive.id}
+                  id={drive._id}
+                  parameters={drive.parameters}
+                  key={drive._id}
                 />
               </Col>
             ))}
