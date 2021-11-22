@@ -46,13 +46,13 @@ def before_first_request():
     global tokenkey
     tokenkey = Fernet.generate_key()
 
-@user_route_blueprint.route("/checkuser", methods = ["POST","GET"])
+@user_route_blueprint.route("/checkuser", methods = ["GET"])
 def checkUser():
     #adminstatus = False
     author = request.headers.get('Authorization')
     try:
         user = authorisationcheck(author)
-        return user,200
+        return {"token":author,"type":user},200
     except:
         return 'Invalid Token',400
     
