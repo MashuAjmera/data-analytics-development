@@ -205,6 +205,84 @@ def clientAddEndpoint():
     else:
         return 'Unauthorised Access',400
 
+@client_route_blueprint.route("/<id>", methods = ["DELETE"])
+def deleteclientByid(id):
+    author = request.headers.get('Authorization')
+    try:
+        user = authorisationcheck(author)
+    except:
+        return 'Invalid Token',400
+
+    if user == 'admin' or user == 'developer':
+        cluster = mongo_client.MongoClient(clusterurl)
+        db = cluster[dbname]
+        collection = db[collectionname]
+        collection.delete_one({"_id":ObjectId(id)})
+        
+        return 'Deleted Successfully',200
+    else:
+        return 'Unauthorised Access',400
+
+@client_route_blueprint.route("<id>/deleteendpoint/<endpointid>", methods = ["DELETE"])
+def clientdeleteEndpoint(id,endpointid):
+    author = request.headers.get('Authorization')
+    try:
+        user = authorisationcheck(author)
+    except:
+        return 'Invalid Token',400
+
+    if user == 'admin' or user == 'developer':
+        #clientid = request.json['clientId']
+        cluster = mongo_client.MongoClient(clusterurl)
+        db = cluster[dbname]
+        collection = db[collectionname]
+        endpoint = request.json['endpoint']
+        resultraw = collection.find_one({"_id":ObjectId(id)})
+        result1 = JSONEncoder().encode(resultraw)
+        resp = json.loads(result1)
+        thisList = []
+        for endpoint in resp['endpoints']:
+            if endpoint['_id'] != endpointid:
+                thisList.append(endpoint)
+
+        thisList.append(endpoint)
+        resultraw = collection.find_one_and_update({'_id':ObjectId(id)},{ '$set': { "endpoints" : thisList}}, return_document = ReturnDocument.AFTER)
+        result = JSONEncoder().encode(resultraw)
+        resp = json.loads(result)
+        
+        return resp,200
+    else:
+        return 'Unauthorised Access',400
+
+@client_route_blueprint.route("/<id>/deletedrive/<driveid>", methods = ["DELETE"])
+def clientdeleteDrive(id,driveid):
+    author = request.headers.get('Authorization')
+    try:
+        user = authorisationcheck(author)
+    except:
+        return 'Invalid Token',400
+
+    if user == 'admin' or user == 'developer':
+        #clientid = request.json['clientId']
+        cluster = mongo_client.MongoClient(clusterurl)
+        db = cluster[dbname]
+        collection = db[collectionname]
+        #drive = request.json['drive']
+        resultraw = collection.find_one({"_id":ObjectId(id)})
+        result1 = JSONEncoder().encode(resultraw)
+        resp = json.loads(result1)
+        thisList = []
+        for drive in resp['drives']:
+            if drive['_id'] != driveid:
+                thisList.append(drive)
+        resultraw = collection.find_one_and_update({'_id':ObjectId(id)},{ '$set': { "drives" : thisList}}, return_document = ReturnDocument.AFTER)
+        result = JSONEncoder().encode(resultraw)
+        resp = json.loads(result)
+        
+        return resp,200
+    else:
+        return 'Unauthorised Access',400
+
 def insert(request):
     client={
         "name": request.name,
