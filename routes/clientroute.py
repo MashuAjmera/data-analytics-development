@@ -236,7 +236,7 @@ def clientdeleteEndpoint(id,endpointid):
         cluster = mongo_client.MongoClient(clusterurl)
         db = cluster[dbname]
         collection = db[collectionname]
-        endpoint = request.json['endpoint']
+        #endpoint = request.json['endpoint']
         resultraw = collection.find_one({"_id":ObjectId(id)})
         result1 = JSONEncoder().encode(resultraw)
         resp = json.loads(result1)
