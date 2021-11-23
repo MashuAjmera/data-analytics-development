@@ -223,7 +223,7 @@ def deleteclientByid(id):
     else:
         return 'Unauthorised Access',400
 
-@client_route_blueprint.route("<id>/deleteendpoint/<endpointid>", methods = ["DELETE"])
+@client_route_blueprint.route("/<id>/deleteendpoint/<endpointid>", methods = ["DELETE"])
 def clientdeleteEndpoint(id,endpointid):
     author = request.headers.get('Authorization')
     try:
