@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { List, Button, message, Spin } from "antd";
 
 export default class Drives extends Component {
-  state = { drives: [], loadNext: false };
+  state = { drives: [], loadNext: false};
 
   componentDidMount() {
     const token = localStorage.getItem("Authorization");
@@ -33,7 +33,7 @@ export default class Drives extends Component {
       </div>
     ) : (
       <List
-        size="small"
+        size="large"
         dataSource={this.state.drives}
         renderItem={(item) => (
           <List.Item key={item._id}>

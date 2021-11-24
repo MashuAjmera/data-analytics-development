@@ -87,7 +87,9 @@ export default class Client extends Component {
           </Col>
           <Col span={12}>
             <Divider orientation="right">
-              <AddDrive />
+              <AddDrive 
+                clientId={this.props._id}
+                setClient={this.setClient}/>
             </Divider>
           </Col>
         </Row>

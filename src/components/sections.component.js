@@ -34,7 +34,7 @@ export default class Sections extends Component {
     return this.props.sections ?<>
           <Form.Item
             label={this.props.sname}
-            name="id"
+            name="_id"
             rules={[
               {
                 required: true,

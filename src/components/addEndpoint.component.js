@@ -43,7 +43,7 @@ export default class AddEndpoint extends Component {
     if (token) {
       let y = [];
       for (const [key, value] of Object.entries(values)) {
-        if (key !== "id") y.push({ _id: key, value: value });
+        if (key !== "_id") y.push({ _id: key, value: value });
       }
       let x = {
         clientId: this.props.clientId,
