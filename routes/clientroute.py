@@ -59,7 +59,7 @@ def clientList():
         return 'Unauthorised',400
      
 
-@client_route_blueprint.route("/add", methods = ["POST","GET"])
+@client_route_blueprint.route("/add", methods = ["POST"])
 def addClient():
     author = request.headers.get('Authorization')
     try:
@@ -82,7 +82,7 @@ def addClient():
         else:
             return 'Client already exists',400
     else:
-        return 'Unauthorised Access',400
+        return 'Unauthorised Access',401
 
 @client_route_blueprint.route("/<id>", methods = ["GET"])
 def clientByid(id):
