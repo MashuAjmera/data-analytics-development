@@ -6,6 +6,7 @@ import Clients from "./components/clients.component";
 import Harmonize from "./components/harmonize.component";
 import CreateDrive from "./components/createDrive.component";
 import Nav from "./components/nav.component";
+import AppGallery from "./components/gallery.component";
 // import 'antd/dist/antd.css';
 import "./static/antd.css";
 import "./App.css";
@@ -23,7 +24,7 @@ export default class App extends Component {
           if(response.ok){
             return response.json();
           }else {
-            throw new Error("Something went wrong");
+            localStorage.removeItem("Authorization");
           }
         }).then(data=>this.setLogin(data))
         .catch(error => message.warning({ content: error }));
@@ -47,7 +48,7 @@ export default class App extends Component {
       <BrowserRouter>
       <Layout>
         <Header>
-          <Nav login={this.state.login} logOut={this.logOut}/>
+          <Nav login={this.state.login} logOut={this.logOut} type={this.state.login && this.state.user.type}/>
         </Header>
         <Content
           style={{
@@ -60,6 +61,7 @@ export default class App extends Component {
               <Route path="/" exact render={(props) => (<Clients user={this.state.user} />)}/>
               <Route path="/harmonize" component={Harmonize} />
               <Route path="/drives" component={CreateDrive} />
+              <Route path="/gallery" component={AppGallery} />
               <Route component={"Overview"} />
             </Switch>
           ) : (
