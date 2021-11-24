@@ -1,8 +1,89 @@
-import React, { Component } from "react";
-import { Modal, Steps, List, Button, Table, Space, Input, message, Spin } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import React, { Component, useContext, useState, useEffect, useRef  } from "react";
+import { Modal, Steps, List, Button, Table, Space, Input, message, Spin, Form, Tooltip } from "antd";
+import { PlusOutlined, InfoCircleOutlined  } from "@ant-design/icons";
 import Sections from "./sections.component";
 import CodeEditor from '@uiw/react-textarea-code-editor';
+const EditableContext = React.createContext(null);
+
+const EditableRow = ({ index, ...props }) => {
+  const [form] = Form.useForm();
+  return (
+    <Form form={form} component={false}>
+      <EditableContext.Provider value={form}>
+        <tr {...props} />
+      </EditableContext.Provider>
+    </Form>
+  );
+};
+
+const EditableCell = ({
+  title,
+  editable,
+  children,
+  dataIndex,
+  record,
+  handleSave,
+  ...restProps
+}) => {
+  const [editing, setEditing] = useState(false);
+  const inputRef = useRef(null);
+  const form = useContext(EditableContext);
+  useEffect(() => {
+    if (editing) {
+      inputRef.current.focus();
+    }
+  }, [editing]);
+
+  const toggleEdit = () => {
+    setEditing(!editing);
+    form.setFieldsValue({
+      [dataIndex]: record[dataIndex],
+    });
+  };
+
+  const save = async () => {
+    try {
+      const values = await form.validateFields();
+      toggleEdit();
+      handleSave({ ...record, ...values });
+    } catch (errInfo) {
+      console.log('Save failed:', errInfo);
+    }
+  };
+
+  let childNode = children;
+
+  if (editable) {
+    childNode = editing ? (
+      <Form.Item
+        style={{
+          margin: 0,
+        }}
+        name={dataIndex}
+        rules={[
+          {
+            required: true,
+            message: `${title} is required.`,
+          },
+        ]}
+      >
+        <Input ref={inputRef} onPressEnter={save} onBlur={save} suffix={
+          <Tooltip title="Press Enter to Save">
+            <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
+          </Tooltip>
+        } />
+      </Form.Item>
+    ) : (
+      <Tooltip title="Click to Add"
+        className="editable-cell-value-wrap"
+        onClick={toggleEdit}>
+        {children}
+      </Tooltip>
+    );
+  }
+
+  return <td {...restProps}>{childNode}</td>;
+};
 
 export default class AddDrive extends Component {
   state = {
@@ -105,12 +186,10 @@ export default class AddDrive extends Component {
         dataIndex: "unit",
       },
       {
-        title: "Type",
-        dataIndex: "type",
-      },
-      {
         title: "Interval",
         dataIndex: "interval",
+        editable: true,
+        render: (_, record) =><>Add Interval</>
       },
     ];
 
@@ -118,6 +197,29 @@ export default class AddDrive extends Component {
       selectedRowKeys,
       onChange: this.onSelectChange,
     };
+    const components = {
+      body: {
+        row: EditableRow,
+        cell: EditableCell,
+      },
+    };
+
+    const columns2 = columns.map((col) => {
+      if (!col.editable) {
+        return col;
+      }
+
+      return {
+        ...col,
+        onCell: (record) => ({
+          record,
+          editable: col.editable,
+          dataIndex: col.dataIndex,
+          title: col.title,
+          handleSave: this.handleSave,
+        }),
+      };
+    });
     const hasSelected = selectedRowKeys.length > 0;
     const { Step } = Steps;
     const steps = [
@@ -146,8 +248,10 @@ export default class AddDrive extends Component {
         content: this.state.drive && (
           <Space direction="vertical">
             <Table
+          components={components}
+          rowClassName={() => 'editable-row'}
               rowSelection={rowSelection}
-              columns={columns}
+              columns={columns2}
               dataSource={this.state.drive.parameters}
               pagination={false}
               scroll={{ y: 240 }}
@@ -206,7 +310,7 @@ export default class AddDrive extends Component {
             {steps[this.state.current].content}
           </div>
         </Modal>
-        <Button icon={<PlusOutlined />} onClick={this.changeDriveModal}>
+        <Button icon={<PlusOutlined />}onClick={this.changeDriveModal}>
           Add Drive
         </Button>
       </>
