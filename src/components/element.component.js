@@ -11,6 +11,8 @@ export default class Element extends Component {
           event.stopPropagation();
           const token = localStorage.getItem("Authorization");
           if (token) {
+            const key = 'updatable';
+            message.loading({ content: 'Sending Request...', key, duration: 10 });
             fetch(
               `/api/clients/${this.props.clientId}/delete${this.props.ename}/${this.props.element._id}`,
               {
@@ -20,7 +22,7 @@ export default class Element extends Component {
             )
               .then((response) => response.json())
               .then((data) => {
-                message.success(`${this.props.ename} deleted successfully.`)
+                message.success({ content: `${this.props.ename} deleted successfully.`, key });
                 this.props.setClient(data);
               })
               .catch((error) => console.log(error));
