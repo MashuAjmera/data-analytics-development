@@ -4,7 +4,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import Sections from "./sections.component";
 
 export default class AddEndpoint extends Component {
-  state = { modal: false, endpoints: null, endpoint: null, token:null, loadEndpoint:false };
+  state = { modal: false, endpoints: null, endpoint: null, token:null, loadEndpoint:false, loadButton:false };
 
   componentDidMount() {
     const token =localStorage.getItem("Authorization");
@@ -31,22 +31,41 @@ export default class AddEndpoint extends Component {
     this.setState({ modal: !this.state.modal });
   };
 
-  onOk=()=>{
-    fetch("/api/client/addendpoint", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      // body: JSON.stringify(values),
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
+  onOk=(values)=>{
+    this.setState({loadButton:true});
+    const token=localStorage.getItem("Authorization");
+    if (token){
+      let y=[]
+      for (const [key, value] of Object.entries(values)) {
+        if(key!=="id")
+          y.push({"id":key,"value":value})
+      }
+      let x={
+        clientId:this.props.clientId,
+        endpoint:{
+          id: values.id,
+          properties: y
         }
+      }
+      fetch("/api/clients/addendpoint", {
+        method: "POST",
+        headers: { Authorization: token, "Content-Type": "application/json" },
+        body: JSON.stringify(x),
       })
-      .then((data) => {
-        this.changeDriveModal();
-        message.success("Logged In Successfully!");
-      })
-      .catch((error) => message.warning({ content: error }));
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          }
+        })
+        .then((data) => {
+          this.setState({loadButton:false});
+          message.success("Endpoint Added Successfully!");
+          console.log(data);
+          this.props.setClient(data);
+          this.changeDriveModal();
+        })
+        .catch((error) => message.warning({ content: error }));
+    }
   }
 
   onCancel=()=>{
@@ -60,11 +79,19 @@ export default class AddEndpoint extends Component {
         <Modal
           title="Add Endpoint"
           visible={this.state.modal}
-          onOk={this.changeDriveModal}
+          onOk={this.onOk}
           okText="Add"
           onCancel={this.onCancel}
+          footer={[
+            <Button onClick={this.onCancel}>
+                Cancel
+            </Button>,
+            <Button form="endpoints" key="submit" htmlType="submit" type="primary" loading={this.state.loadButton}>
+                Add
+            </Button>,
+            ]}
         >
-          {this.state.endpoints && <Sections sections={this.state.endpoints} sname="endpoints"/>}
+          {this.state.endpoints && <Sections sections={this.state.endpoints} onOk={this.onOk} sname="endpoints"/>}
         </Modal>
         <Button icon={<PlusOutlined />} onClick={this.changeDriveModal}>
           Add Endpoint
