@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import { Typography, Menu, Divider } from "antd";
+import { Typography, Menu } from "antd";
 import {Link } from "react-router-dom";
 import {
+  UserOutlined,
   AppstoreOutlined,
   LinkOutlined,
   ApartmentOutlined,
@@ -23,6 +24,8 @@ export default class Nav extends Component {
 
   render() {
     const { Title } = Typography;
+    const { SubMenu } = Menu;
+
     return (
       <Menu
         theme="dark"
@@ -38,7 +41,7 @@ export default class Nav extends Component {
             level={2}
             style={{
               color: "#dddddd",
-              width: "calc(100vw - 750px)",
+              width: "calc(100vw - 900px)",
               marginTop: "10px",
               marginBottom: "10px",
             }}
@@ -56,20 +59,17 @@ export default class Nav extends Component {
               <Link to="/harmonize">Harmonize</Link>
             </Menu.Item>
             <Menu.Item key="drives" icon={<LinkOutlined />}>
-              
               <Link to="/drives">Drives</Link>
             </Menu.Item>
-            <Menu.Item key="6" onClick={this.props.logOut}>
-              <Divider
-                type="vertical"
-                style={{
-                  borderLeftColor: "#f5222d",
-                  height: "2em",
-                  marginRight: "11px",
-                }}
-              />
-              Log Out
+            <Menu.Item key="gallery" icon={<LinkOutlined />}>
+              <Link to="/gallery">App Gallery</Link>
             </Menu.Item>
+            <SubMenu key="user" icon={<UserOutlined />} title="Profile">
+            <Menu.Item key="5">{this.props.type} account</Menu.Item>
+            <Menu.Item key="6" onClick={this.props.logOut}>
+              logout
+            </Menu.Item>
+        </SubMenu>
           </>
         )}
       </Menu>
