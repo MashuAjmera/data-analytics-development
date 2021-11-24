@@ -119,7 +119,7 @@ def clientByid(id):
             driveListItem = {
                 "_id":drive['_id'],
                 "name":resultdrive2['name'],
-                "properties":[{"protocol":resultprotocol2['name']},{"datapoints":datapointsize}]
+                "properties":[{"name":"protocol","value":resultprotocol2['name']},{"name":"datapoints","value":datapointsize}]
             }
             driveList.append(driveListItem)
         
