@@ -99,7 +99,57 @@ def clientByid(id):
         resultraw = collection.find_one({"_id":ObjectId(id)})
         result = JSONEncoder().encode(resultraw)
         resp = json.loads(result)
-        return {"client": resp},200
+        driveList = []
+        endpointList = []
+        infoDb = cluster['informationModel']
+        collectionDrives = infoDb['drives']
+        collectionProtocol = infoDb['protocols']
+        collectionEndpoint = infoDb['endpoints']
+        for drive in resp['drives']:
+            resultprotocol = collectionProtocol.find_one({"_id":ObjectId(drive['protocol']['_id'])})
+            resultprotocol1 = JSONEncoder().encode(resultprotocol)
+            resultprotocol2 = json.loads(resultprotocol1)
+            print(resultprotocol2)
+            resultdrive = collectionDrives.find_one({"_id":ObjectId(drive['_id'])})
+            resultdrive1 = JSONEncoder().encode(resultdrive)
+            resultdrive2 = json.loads(resultdrive1)
+            #print(resultdrive2)
+            datapointsize = len(drive['parameters'])
+            #print(datapointsize)
+            driveListItem = {
+                "_id":drive['_id'],
+                "name":resultdrive2['name'],
+                "properties":[{"protocol":resultprotocol2['name']},{"datapoints":datapointsize}]
+            }
+            driveList.append(driveListItem)
+        
+        for endpoint in resp['endpoints']:
+            resultendpoint = collectionEndpoint.find_one({"_id":ObjectId(endpoint['_id'])})
+            resultendpoint1 = JSONEncoder().encode(resultendpoint)
+            resultendpoint2 = json.loads(resultendpoint1)
+            propertiesList = []
+            for prop in endpoint['properties']:
+                for proper in resultendpoint2['properties']:
+                    if prop['_id'] == proper['_id']:
+                        propertiesListItem = {"_id":prop['_id'],"name":proper['name'],"value":prop['value']}
+                        propertiesList.append(propertiesListItem)
+                        break
+            #print(resultendpoint2)
+            endpointListItem = {
+                "_id":resultendpoint2['_id'],
+                "name":resultendpoint2['name'],
+                "properties":propertiesList
+            }
+            endpointList.append(endpointListItem)
+
+        responsefinal = {
+            "_id":id,
+            "name":resp['name'],
+            "drives":driveList,
+            "endpoints":endpointList
+
+        }
+        return {"client": responsefinal},200
     else:
         return 'Unauthorised Access',400
 
@@ -150,6 +200,84 @@ def clientAddEndpoint():
         thisList = resp['endpoints']
         thisList.append(endpoint)
         resultraw = collection.find_one_and_update({'_id':ObjectId(clientid)},{ '$set': { "endpoints" : thisList}}, return_document = ReturnDocument.AFTER)
+        result = JSONEncoder().encode(resultraw)
+        resp = json.loads(result)
+        
+        return resp,200
+    else:
+        return 'Unauthorised Access',400
+
+@client_route_blueprint.route("/<id>", methods = ["DELETE"])
+def deleteclientByid(id):
+    author = request.headers.get('Authorization')
+    try:
+        user = authorisationcheck(author)
+    except:
+        return 'Invalid Token',400
+
+    if user == 'admin' or user == 'developer':
+        cluster = mongo_client.MongoClient(clusterurl)
+        db = cluster[dbname]
+        collection = db[collectionname]
+        collection.delete_one({"_id":ObjectId(id)})
+        
+        return 'Deleted Successfully',200
+    else:
+        return 'Unauthorised Access',400
+
+@client_route_blueprint.route("/<id>/deleteendpoint/<endpointid>", methods = ["DELETE"])
+def clientdeleteEndpoint(id,endpointid):
+    author = request.headers.get('Authorization')
+    try:
+        user = authorisationcheck(author)
+    except:
+        return 'Invalid Token',400
+
+    if user == 'admin' or user == 'developer':
+        #clientid = request.json['clientId']
+        cluster = mongo_client.MongoClient(clusterurl)
+        db = cluster[dbname]
+        collection = db[collectionname]
+        #endpoint = request.json['endpoint']
+        resultraw = collection.find_one({"_id":ObjectId(id)})
+        result1 = JSONEncoder().encode(resultraw)
+        resp = json.loads(result1)
+        thisList = []
+        for endpoint in resp['endpoints']:
+            if endpoint['_id'] != endpointid:
+                thisList.append(endpoint)
+
+        thisList.append(endpoint)
+        resultraw = collection.find_one_and_update({'_id':ObjectId(id)},{ '$set': { "endpoints" : thisList}}, return_document = ReturnDocument.AFTER)
+        result = JSONEncoder().encode(resultraw)
+        resp = json.loads(result)
+        
+        return resp,200
+    else:
+        return 'Unauthorised Access',400
+
+@client_route_blueprint.route("/<id>/deletedrive/<driveid>", methods = ["DELETE"])
+def clientdeleteDrive(id,driveid):
+    author = request.headers.get('Authorization')
+    try:
+        user = authorisationcheck(author)
+    except:
+        return 'Invalid Token',400
+
+    if user == 'admin' or user == 'developer':
+        #clientid = request.json['clientId']
+        cluster = mongo_client.MongoClient(clusterurl)
+        db = cluster[dbname]
+        collection = db[collectionname]
+        #drive = request.json['drive']
+        resultraw = collection.find_one({"_id":ObjectId(id)})
+        result1 = JSONEncoder().encode(resultraw)
+        resp = json.loads(result1)
+        thisList = []
+        for drive in resp['drives']:
+            if drive['_id'] != driveid:
+                thisList.append(drive)
+        resultraw = collection.find_one_and_update({'_id':ObjectId(id)},{ '$set': { "drives" : thisList}}, return_document = ReturnDocument.AFTER)
         result = JSONEncoder().encode(resultraw)
         resp = json.loads(result)
         
