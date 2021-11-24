@@ -1,6 +1,12 @@
-import React, { Component, useContext, useState, useEffect, useRef  } from "react";
-import { Table, Space, Input, Form, Tooltip, Empty } from "antd";
-import {  InfoCircleOutlined  } from "@ant-design/icons";
+import React, {
+  Component,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
+import { Table, Input, Form, Tooltip, Spin, message, Empty } from "antd";
+import { InfoCircleOutlined } from "@ant-design/icons";
 const EditableContext = React.createContext(null);
 
 const EditableRow = ({ index, ...props }) => {
@@ -45,7 +51,7 @@ const EditableCell = ({
       toggleEdit();
       handleSave({ ...record, ...values });
     } catch (errInfo) {
-      console.log('Save failed:', errInfo);
+      console.log("Save failed:", errInfo);
     }
   };
 
@@ -65,16 +71,23 @@ const EditableCell = ({
           },
         ]}
       >
-        <Input ref={inputRef} onPressEnter={save} onBlur={save} suffix={
-          <Tooltip title="Press Enter to Save">
-            <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
-          </Tooltip>
-        } />
+        <Input
+          ref={inputRef}
+          onPressEnter={save}
+          onBlur={save}
+          suffix={
+            <Tooltip title="Press Enter to Save">
+              <InfoCircleOutlined style={{ color: "rgba(0,0,0,.45)" }} />
+            </Tooltip>
+          }
+        />
       </Form.Item>
     ) : (
-      <Tooltip title="Click to Add"
+      <Tooltip
+        title="Click to Change"
         className="editable-cell-value-wrap"
-        onClick={toggleEdit}>
+        onClick={toggleEdit}
+      >
         {children}
       </Tooltip>
     );
@@ -86,32 +99,37 @@ const EditableCell = ({
 export default class DataPoints extends Component {
   state = {
     driveModal: false,
-    token:null,
-    current: 0,
-    drives: [],
-    loadNext:false,
+    loadNext: false,
     drive: null,
     protocol: null,
-    rule:'',
-    selectedRowKeys: [], code:`# Modify code below\ndef rule(drive): \n\treturn drive.parameters}`
+    rule: "",
+    code: `# Modify code below\ndef rule(drive): \n\treturn drive.parameters}`,
   };
 
-  onSelectChange = (selectedRowKeys) => {
-    console.log("selectedRowKeys changed: ", selectedRowKeys);
-    this.setState({ selectedRowKeys });
-  };
-
-  onChange = ({ target: { value } }) => {
-    this.setState({ rule:value });
+  handleSave = (row) => {
+    const index = this.props.dataSource.findIndex((item) => row._id === item._id);
+    const item = this.props.dataSource[index];
+    const key = 'updatable';
+    message.loading({ content: 'Sending Request...', key, duration: 10 });
+    var which;
+    if (row.name !== item.name) {which="name"}
+    else if (row.interval !== item.interval) { which="interval" }
+    const token = localStorage.getItem("Authorization");
+    if(token){
+      fetch(`/api/drives/${this.props._id}/parameters/${row._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: token },
+        body: JSON.stringify({ [which]: row[which] })
+      }).then(response => response.json())
+      .then((data) => {
+        this.props.handleClick(this.props._id);
+        message.success({ content: "successfully updated", key });
+      })
+        .catch(error => message.warning({ content: error, key }));
+    }
   };
 
   render() {
-    const { selectedRowKeys } = this.state;
-
-    const rowSelection = {
-      selectedRowKeys,
-      onChange: this.onSelectChange,
-    };
     const components = {
       body: {
         row: EditableRow,
@@ -135,25 +153,23 @@ export default class DataPoints extends Component {
         }),
       };
     });
-    const hasSelected = selectedRowKeys.length > 0;
-    
-    return (
-      <Space direction="vertical">
-            {this.props.dataSource ? <Table
-          components={components}
-          rowClassName={() => 'editable-row'}
-              rowSelection={rowSelection}
-              columns={columns2}
-              dataSource={this.props.dataSource}
-              pagination={false}
-              scroll={{ y: 240 }}
-            />:<Empty description={<span>Please select a drive!</span>} />}
-            <span style={{ marginLeft: 8 }}>
-              {hasSelected
-                ? `Selected ${selectedRowKeys.length} data points`
-                : ""}
-            </span>
-          </Space>
-    );
+
+    return this.props.dataSource ? (
+          <Table
+            components={components}
+            rowClassName={() => "editable-row"}
+            bordered
+            locale={{emptyText:<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Parameter" />}}
+            rowSelection={this.props.rowSelection}
+            columns={columns2}
+            dataSource={this.props.dataSource.map(data=>{data.key=data._id; return data;})}
+            pagination={false}
+            scroll={{ y: "30em" }}
+          />
+        ) : (
+          <div className="example">
+          <Spin size="large" />
+        </div>
+        )
   }
 }
