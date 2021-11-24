@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Modal, Steps, Button, message, Form } from "antd";
+import { Modal, Steps, Button, message, Form, Space } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import CodeEditor from "@uiw/react-textarea-code-editor";
 import Sections from "./sections.component";
@@ -52,7 +52,8 @@ export default class AddDrive extends Component {
   };
 
   handleClick = (_id) => {
-    this.setState({ current: 1 });
+    this.setState({ current: 1, drive:null,
+      selectedRowKeys: [] });
     fetch(`/api/drives/${_id}`, {
       headers: { Authorization: this.state.token },
     })
@@ -94,6 +95,46 @@ export default class AddDrive extends Component {
     this.setState({ code: value });
   };
 
+  onOk = (values) => {
+    this.setState({ loadButton: true });
+    const token = localStorage.getItem("Authorization");
+    if (token) {
+      let y = [];
+      for (const [key, value] of Object.entries(values)) {
+        if (key !== "_id") y.push({ _id: key, value: value });
+      }
+      let x = {
+        clientId: this.props.clientId,
+        drive: {
+          _id: this.state.drive._id,
+          protocol: { _id: values._id, properties: y },
+          parameters: this.state.selectedRowKeys.map((key) => ({
+            _id: key,
+            interval: "1000",
+          })),
+          rule: this.state.code,
+        },
+      };
+      fetch("/api/clients/adddrive", {
+        method: "POST",
+        headers: { Authorization: token, "Content-Type": "application/json" },
+        body: JSON.stringify(x),
+      })
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          }
+        })
+        .then((data) => {
+          this.setState({ loadButton: false });
+          message.success("Drive Added Successfully!");
+          this.props.setClient(data);
+          this.changeDriveModal();
+        })
+        .catch((error) => message.warning({ content: error }));
+    }
+  };
+
   render() {
     const onFinishFailed = (errorInfo) => {
       console.log("Failed:", errorInfo);
@@ -121,21 +162,23 @@ export default class AddDrive extends Component {
         content: <Drives handleClick={this.handleClick} />,
       },
       {
-        title: "Protocol",
-        content: (
-          <Sections
-            sections={this.state.drive && this.state.drive.protocols}
-            sname="protocols"
-          />
-        ),
-      },
-      {
         title: "Data Points",
         content: (
-          <DataPoints
-            columns={columns}
-            dataSource={this.state.drive && this.state.drive.parameters}
-          />
+          <Space direction="vertical">
+            <DataPoints
+              columns={columns}
+              dataSource={this.state.drive && this.state.drive.parameters}
+              rowSelection={{
+                selectedRowKeys: this.state.selectedRowKeys,
+                onChange: this.onSelectChange,
+              }}
+            />
+            <span style={{ marginLeft: 8 }}>
+              {this.state.selectedRowKeys.length > 0
+                ? `Selected ${this.state.selectedRowKeys.length} data points`
+                : ``}
+            </span>
+          </Space>
         ),
       },
       {
@@ -168,6 +211,15 @@ export default class AddDrive extends Component {
           </>
         ),
       },
+      {
+        title: "Protocol",
+        content: (
+          <Sections
+            sections={this.state.drive && this.state.drive.protocols}
+            sname="protocols"
+          />
+        ),
+      },
     ];
     return (
       <>
@@ -182,18 +234,16 @@ export default class AddDrive extends Component {
             this.state.current === 0 && (
               <Button type="primary">Select Drive</Button>
             ),
-            this.state.current === 1 && <Button
-              type="primary"
-              onClick={() => this.changeCurrent(2)}
-            >
-              Next
-            </Button>,
-            this.state.current === 2 && <Button
-              type="primary"
-              onClick={() => this.changeCurrent(3)}
-            >
-              Next
-            </Button>,
+            this.state.current === 1 && (
+              <Button type="primary" onClick={() => this.changeCurrent(2)}>
+                Next
+              </Button>
+            ),
+            this.state.current === 2 && (
+              <Button type="primary" onClick={() => this.changeCurrent(3)}>
+                Next
+              </Button>
+            ),
             this.state.current === 3 && (
               <Button
                 form="drives"
@@ -216,20 +266,19 @@ export default class AddDrive extends Component {
               />
             ))}
           </Steps>
-
-        <Form
-          name="drives"
-          initialValues={{
-            remember: true,
-          }}
-          onFinish={this.onOk}
-          labelCol={{ span: 4 }}
-          onFinishFailed={onFinishFailed}
-          autoComplete="off"
-        >
-          <div className="steps-content">
-            {steps[this.state.current].content}
-          </div>
+          <Form
+            name="drives"
+            initialValues={{
+              remember: true,
+            }}
+            onFinish={this.onOk}
+            labelCol={{ span: 4 }}
+            onFinishFailed={onFinishFailed}
+            autoComplete="off"
+          >
+            <div className="steps-content">
+              {steps[this.state.current].content}
+            </div>
           </Form>
         </Modal>
         <Button icon={<PlusOutlined />} onClick={this.changeDriveModal}>
