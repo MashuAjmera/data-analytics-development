@@ -33,7 +33,6 @@ export default class App extends Component {
   logOut = (e) => {
     localStorage.removeItem("Authorization");
     this.setState({ user: {}, login: false });
-    window.location.reload();
     message.success({ content: "Logged Out Successfully!" });
   };
 
