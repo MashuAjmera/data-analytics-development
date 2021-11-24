@@ -25,8 +25,8 @@ export default class Clients extends Component {
   }
 
   showClients = () => {
-    const token =localStorage.getItem("Authorization");
-    if(token){
+    const token = localStorage.getItem("Authorization");
+    if (token) {
       this.setState({ loadClients: true });
       // FETCH GET /api/clients/ <- all client names
       fetch("/api/clients/", {
@@ -47,12 +47,12 @@ export default class Clients extends Component {
   };
 
   createClient = (value) => {
-    const token =localStorage.getItem("Authorization");
-    if(token){
+    const token = localStorage.getItem("Authorization");
+    if (token) {
       this.setState({ createClientLoading: true });
       // FETCH POST /api/clients/add -> create a blank client
       fetch("/api/clients/add", {
-        method: 'POST',
+        method: "POST",
         headers: {
           Authorization: token,
           "Content-Type": "application/json",
@@ -77,28 +77,37 @@ export default class Clients extends Component {
     const { Panel } = Collapse;
     const { Title } = Typography;
     const genExtra = (_id) => (
-      <DeleteOutlined
-      onClick={(event) => {
-        // If you don't want click extra trigger collapse, you can prevent this:
-        event.stopPropagation();
-        const token = localStorage.getItem("Authorization");
-        if (token) {
-          fetch(
-            `/api/clients/${_id}`,
-            {
-              headers: { Authorization: token },
-              method: "DELETE",
+      <>
+        <Button type="text">Publish</Button>
+        <DeleteOutlined
+          onClick={(event) => {
+            // If you don't want click extra trigger collapse, you can prevent this:
+            event.stopPropagation();
+            const token = localStorage.getItem("Authorization");
+            if (token) {
+              const key = "updatable";
+              message.loading({
+                content: "Sending Request...",
+                key,
+                duration: 10,
+              });
+              fetch(`/api/clients/${_id}`, {
+                headers: { Authorization: token },
+                method: "DELETE",
+              })
+                .then((response) => response.json())
+                .then((data) => {
+                  message.success({
+                    content: "Client deleted successfully.",
+                    key,
+                  });
+                  this.showClients();
+                })
+                .catch((error) => console.log(error));
             }
-          )
-            .then((response) => response.json())
-            .then((data) => {
-              message.success('Client deleted successfully.')
-              this.showClients();
-            })
-            .catch((error) => console.log(error));
-        }
-      }}
-      />
+          }}
+        />
+      </>
     );
 
     return (
@@ -123,18 +132,25 @@ export default class Clients extends Component {
             </Popover>,
           ]}
         />
-          {this.state.loadClients?<div className="example"><Spin size="large" /></div>:this.state.clients.length >= 1 ? (
-            <Collapse accordion bordered={false}>
-              {this.state.clients.map((client) => (
-                <Panel header={client.name} key={client._id} extra={genExtra(client._id)}>
-                  <Client _id={client._id} user={this.props.user} />
-                </Panel>
-              ))}
-            </Collapse>
-          ) : (
-            <Empty description={<span>No client created yet!</span>} />
-          )}
-        
+        {this.state.loadClients ? (
+          <div className="example">
+            <Spin size="large" />
+          </div>
+        ) : this.state.clients.length >= 1 ? (
+          <Collapse accordion bordered={false}>
+            {this.state.clients.map((client) => (
+              <Panel
+                header={client.name}
+                key={client._id}
+                extra={genExtra(client._id)}
+              >
+                <Client _id={client._id} user={this.props.user} />
+              </Panel>
+            ))}
+          </Collapse>
+        ) : (
+          <Empty description={<span>No client created yet!</span>} />
+        )}
       </>
     );
   }
