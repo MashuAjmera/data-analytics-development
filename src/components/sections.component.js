@@ -4,59 +4,51 @@ import { Select, Form, Input, Spin , message} from "antd";
 export default class Sections extends Component {
   state = { section: null, load: false, token:null };
 
-  componentDidMount() {
-    const token = localStorage.getItem("Authorization");
-    this.setState({ token },this.getClient);
-  }
-
   handleChange = (id) => {
-
-    this.setState({ load: true });
-    // FETCH GET /api/${this.props.sname}/id <- get all properties of endpoint
-    // fetch(`/api/${this.props.sname}/${id}`, {
-    //   headers: { Authorization: this.state.token },
-    // })
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     console.log(data);
-    //     this.setState({ section: data[this.props.sname],current:1 });
-    //   })
-    //   .catch((error) => message.warning({ content: error }));
-    this.setState({
-      section: {
-        name: "hi",
-        properties: [
-          { name: "IP", required: true, type: "integer" },
-          { name: "PORT", required: true, type: "integer" },
-        ],
-      },
-    });
-    this.setState({ load: false });
+    const token = localStorage.getItem("Authorization");
+    if(token){
+      this.setState({ load: true });
+      // FETCH GET /api/${this.props.sname}/id <- get all properties of endpoint
+      fetch(`/api/${this.props.sname}/${id}`, {
+        headers: { Authorization: token },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          this.setState({ section: data,current:1, load:false });
+        })
+        .catch((error) => message.warning({ content: error }));
+    }
+    // this.setState({
+    //   section: {
+    //     name: "hi",
+    //     properties: [
+    //       { name: "IP", required: true, type: "integer" },
+    //       { name: "PORT", required: true, type: "integer" },
+    //     ],
+    //   },
+    // });
+    // this.setState({ load: false });
   };
 
   render() {
-    const onFinish = (values) => {
-      console.log("Success:", values);
-    };
-
     const onFinishFailed = (errorInfo) => {
       console.log("Failed:", errorInfo);
     };
 
     return (
-      <>
         <Form
-          name="basic"
+          name={this.props.sname}
           initialValues={{
             remember: true,
           }}
-          onFinish={onFinish}
+          onFinish={this.props.onOk}
           labelCol={{ span: 4 }}
           onFinishFailed={onFinishFailed}
           autoComplete="off"
         >
           <Form.Item
             label={this.props.sname}
+            name="id"
             rules={[
               {
                 required: true,
@@ -89,7 +81,8 @@ export default class Sections extends Component {
             this.state.section && this.state.section.properties.map((property) => (
               <Form.Item
                 label={property.name}
-                name={property.name}
+                key={property.name}
+                name={property._id}
                 rules={[
                   {
                     required: property.required,
@@ -102,7 +95,6 @@ export default class Sections extends Component {
             ))
           )}
         </Form>
-      </>
     );
   }
 }
