@@ -1,9 +1,12 @@
 import React, { Component } from "react";
-import { Form, Select, Button, Upload, message, Typography } from "antd";
+import { Form, Select, Button, Upload, message, Typography, Input,PageHeader } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
+import DataPoints from "./dataPoints.component";
 export default class CreateDrive extends Component {
   state = {
+    count:1,
     protocols: [],
+    parameters:[],
     selectedItems: [],
     loadProtocols:false
   };
@@ -27,9 +30,46 @@ export default class CreateDrive extends Component {
     this.setState({ selectedItems });
   };
 
+  handleAdd = () => {
+    const { count, parameters } = this.state;
+    const newParameter = {
+      key: count,
+      _id: count,
+      name: `Parameter ${count}`,
+      unit: 'Nm',
+    };
+    this.setState({
+      parameters: [...parameters, newParameter],
+      count: count + 1,
+    });
+  };
+
   render() {
+    const columns = [
+      {
+        title: "ParamId",
+        dataIndex: "_id",
+        editable: true,
+      },
+      {
+        title: "Name",
+        dataIndex: "name",
+        editable: true,
+      },
+      {
+        title: "Unit",
+        dataIndex: "unit",
+        editable: true,
+      },
+    ];
+
     const onFinish = (values) => {
-      console.log("Success:", values);
+      let x={
+        name:values.name,
+        protocols: this.state.selectedItems,
+        parameters: this.state.parameters
+      }
+      console.log("Success:", x);
     };
 
     const onFinishFailed = (errorInfo) => {
@@ -75,8 +115,18 @@ export default class CreateDrive extends Component {
         onFinishFailed={onFinishFailed}
         autoComplete="off"
       >
-        <Title style={{ textAlign: "center" }}>Create your Virtual Drive</Title>
-        <Form.Item
+
+<PageHeader
+          className="site-page-header"
+          title={<Title level={2}>Create Virtual Drive</Title>}
+          extra={[
+            <Button type="primary" htmlType="submit">
+              Create Drive
+            </Button>,
+          ]}
+        />
+        {/* <Title level={2} style={{ textAlign: "center" }}>Create your Virtual Drive</Title> */}
+        {/* <Form.Item
           label="Parameter File"
           name="name"
           rules={[
@@ -89,8 +139,20 @@ export default class CreateDrive extends Component {
           <Upload {...props}>
             <Button icon={<UploadOutlined />}>Upload JSON</Button>
           </Upload>
-        </Form.Item>
+        </Form.Item> */}
 
+        <Form.Item
+          label="Name"
+          name="name"
+          rules={[
+            {
+              required: true,
+              message: "Please input your password!",
+            },
+          ]}
+        >
+          <Input placeholder="Enter virtual drive name"/>
+        </Form.Item>
         <Form.Item
           label="Protocols"
           name="protocols"
@@ -119,16 +181,31 @@ export default class CreateDrive extends Component {
             ))}
           </Select>
         </Form.Item>
-
         <Form.Item
-          wrapperCol={{
-            offset: 8,
-            span: 16,
+          label="Parameters"
+          name="parameters"
+          rules={[
+            {
+              required: true,
+              message: "Please input your password!",
+            },
+          ]}
+        >
+
+        <Button
+         icon={<UploadOutlined />}
+          onClick={this.handleAdd}
+          style={{
+            marginBottom: 16,
           }}
         >
-          <Button type="primary" htmlType="submit">
-            Create Drive
-          </Button>
+          Add a Parameter
+        </Button>
+        <DataPoints
+          columns={columns}
+          handleClick={this.handleClick}
+          dataSource={this.state.parameters}
+        />
         </Form.Item>
       </Form>
     );
