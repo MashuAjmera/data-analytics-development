@@ -117,7 +117,7 @@ def drivebyId(id):
     else:
         return 'Unauthorised Access',400
 
-@drive_route_blueprint.route("/createDrive", methods = ["POST"])
+@drive_route_blueprint.route("/createdrive", methods = ["POST"])
 def createDrive():
     author = request.headers.get('Authorization')
     try:
