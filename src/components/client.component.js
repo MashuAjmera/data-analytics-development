@@ -29,55 +29,58 @@ export default class Client extends Component {
     // });
   }
 
-  setClient=(client)=>{
-    this.setState({client})
-  }
+  setClient = (client) => {
+    this.setState({ client });
+  };
 
   getClient = () => {
     const token = localStorage.getItem("Authorization");
-    if (token){
+    if (token) {
       this.setState({ loadClient: true });
       // FETCH client information using client id GET /api/clients/<id>
-      fetch(`/api/clients/${this.props.id}`, {
+      fetch(`/api/clients/${this.props._id}`, {
         headers: { Authorization: token },
       })
         .then((response) => response.json())
         .then((data) => {
           this.setClient(data.client);
-          this.setState({ loadClient: false});
+          this.setState({ loadClient: false });
         })
         .catch((error) => message.warning({ content: error }));
     }
   };
 
   render() {
-    return this.state.loadClient?<div className="example"><Spin size="large" /></div>:(<>
+    return this.state.loadClient ? (
+      <div className="example">
+        <Spin size="large" />
+      </div>
+    ) : (
+      <>
         <Row>
           <Col span={12}>
             <Divider orientation="left">Endpoints</Divider>
           </Col>
           <Col span={12}>
             <Divider orientation="right">
-              <AddEndpoint clientId={this.props.id} setClient={this.setClient}/>
+              <AddEndpoint
+                clientId={this.props._id}
+                setClient={this.setClient}
+              />
             </Divider>
           </Col>
         </Row>
-        {this.state.client.endpoints.length>=1 ? (
+        {this.state.client.endpoints.length >= 1 ? (
           <Row gutter={16}>
             {this.state.client.endpoints.map((endpoint) => (
-              <Col span={5} key={endpoint.id}>
-                <Element
-                  id={endpoint.id}
-                  properties={endpoint.properties}
-                  
-                />
+              <Col span={5} key={endpoint._id}>
+              <Element element={endpoint} clientId={this.props._id} setClient={this.setClient} ename={"endpoint"}/>
               </Col>
             ))}
           </Row>
         ) : (
-          <Empty description={<span>No endpoint added yet!</span>}/>
+          <Empty description={<span>No endpoint added yet!</span>} />
         )}
-        {/* </Skeleton.Input> */}
         <Row>
           <Col span={12}>
             <Divider orientation="left">Drives</Divider>
@@ -88,19 +91,16 @@ export default class Client extends Component {
             </Divider>
           </Col>
         </Row>
-        {this.state.client.drives.length>=1 ? (
+        {this.state.client.drives.length >= 1 ? (
           <Row gutter={16}>
             {this.state.client.drives.map((drive) => (
-              <Col span={5}              key={drive.id}>
-                {/* <Element
-                  id={drive.id}
-                  properties={drive.properties}
-                /> */}
+              <Col span={5} key={drive._id}>
+                <Element element={drive}/>
               </Col>
             ))}
           </Row>
         ) : (
-          <Empty description={<span>No drive added yet!</span>}/>
+          <Empty description={<span>No drive added yet!</span>} />
         )}
       </>
     );
