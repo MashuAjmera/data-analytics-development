@@ -305,8 +305,8 @@ def clientdeleteEndpoint(id,endpointid):
 
         thisList.append(endpoint)
         resultraw = collection.find_one_and_update({'_id':ObjectId(id)},{ '$set': { "endpoints" : thisList}}, return_document = ReturnDocument.AFTER)
-        result = JSONEncoder().encode(resultraw)
-        resp = json.loads(result)
+        resp = returnexistingclientbyid(id)
+        return resp,200
         
         return resp,200
     else:
@@ -334,8 +334,8 @@ def clientdeleteDrive(id,driveid):
             if drive['_id'] != driveid:
                 thisList.append(drive)
         resultraw = collection.find_one_and_update({'_id':ObjectId(id)},{ '$set': { "drives" : thisList}}, return_document = ReturnDocument.AFTER)
-        result = JSONEncoder().encode(resultraw)
-        resp = json.loads(result)
+        resp = returnexistingclientbyid(id)
+        return resp,200
         
         return resp,200
     else:
