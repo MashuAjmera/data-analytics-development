@@ -8,6 +8,7 @@ from bson.objectid import ObjectId
 import json
 from routes.userroute import authorisationcheck
 from pymongo import ReturnDocument
+import os
 
 
 drive_route_blueprint = Blueprint('drive_route_blueprint', __name__)
@@ -21,6 +22,43 @@ class JSONEncoder(json.JSONEncoder):
         if isinstance(o, ObjectId):
             return str(o)
         return json.JSONEncoder.default(self, o)
+
+def insertDrive(path,protocolList):
+    try:
+
+        with open(path, encoding='utf-8-sig') as myfile:
+            data=myfile.read()
+
+        obj = json.loads(data)
+        thislist = []
+        dname = str(obj["name"])
+
+        for variablename in obj['variables']:
+            #print(str(obj['variables'][variablename]))
+            try:
+                namevar = str(obj['variables'][variablename]['description']).split(" (")[0]
+                listitem = {"_id":variablename,"name":namevar,"unit":str(obj['variables'][variablename]['unit'])}
+                thislist.append(listitem)
+            except:
+                namevar = str(obj['variables'][variablename]['description']).split(" (")[0]
+                listitem = {"_id":variablename,"name":namevar,"unit":"NA"}
+                thislist.append(listitem)
+
+        cluster = mongo_client.MongoClient(clusterurl)
+        db = cluster[dbname]
+        collection = db[collectionname]
+        
+
+        drivedata = {
+            "name":dname,
+            "parameters":thislist,
+            "protocols": protocolList
+        }
+        collection.insert_one(drivedata)
+        return 1
+    except:
+        return 0
+
 
 @drive_route_blueprint.route("/", methods = ["GET"])
 def driveList():
@@ -81,18 +119,25 @@ def drivebyId(id):
 
 @drive_route_blueprint.route("/createDrive", methods = ["POST"])
 def createDrive():
-    #author = request.headers.get('Authorization')
-    #try:
-    #    user = authorisationcheck(author)
-    #except:
-    #    return 'Invalid Token',400
-    #if user == 'admin' or user == 'onboarder':
-    f = request.files['file']
-    print(f.filename)
-    f.save('/home/ashwin/Desktop', f.filename)
-    return 'Successful',200
-    #else:
-    #    return 'Unauthorised Access',400
+    author = request.headers.get('Authorization')
+    try:
+        user = authorisationcheck(author)
+    except:
+        return 'Invalid Token',400
+    if user == 'admin' or user == 'onboarder':
+        homedir = os.path.expanduser('~')
+        if request.method == 'POST':  
+            f = request.files['file']  
+            f.save(homedir,f.filename)
+            finalpath = homedir+f.filename
+            protoList = request.json['protocols']
+            ret = insertDrive(finalpath,protoList)
+        if ret == 1:
+            return 'Successful',200
+        else:
+            return 'Unsuccessful',400
+    else:
+        return 'Unauthorised Access',400
 
 @drive_route_blueprint.route("/<id>/parameters/<paramid>", methods = ["PUT"])
 def editdriveparameter(id,paramid):
