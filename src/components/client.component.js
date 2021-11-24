@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Row, Col, Divider, Empty, message, Spin } from "antd";
-import Endpoint from "./endpoint.component";
-import Drive from "./drive.component";
+import Element from "./element.component";
 import AddDrive from "./addDrive.component";
 import AddEndpoint from "./addEndpoint.component";
 
@@ -30,6 +29,10 @@ export default class Client extends Component {
     // });
   }
 
+  setClient=(client)=>{
+    this.setState({client})
+  }
+
   getClient = () => {
     const token = localStorage.getItem("Authorization");
     if (token){
@@ -40,7 +43,8 @@ export default class Client extends Component {
       })
         .then((response) => response.json())
         .then((data) => {
-          this.setState({ loadClient: false, client: data.client });
+          this.setClient(data.client);
+          this.setState({ loadClient: false});
         })
         .catch((error) => message.warning({ content: error }));
     }
@@ -54,18 +58,18 @@ export default class Client extends Component {
           </Col>
           <Col span={12}>
             <Divider orientation="right">
-              <AddEndpoint clientId={this.props.id}/>
+              <AddEndpoint clientId={this.props.id} setClient={this.setClient}/>
             </Divider>
           </Col>
         </Row>
         {this.state.client.endpoints.length>=1 ? (
           <Row gutter={16}>
             {this.state.client.endpoints.map((endpoint) => (
-              <Col span={5}>
-                <Endpoint
+              <Col span={5} key={endpoint.id}>
+                <Element
                   id={endpoint.id}
                   properties={endpoint.properties}
-                  key={endpoint.id}
+                  
                 />
               </Col>
             ))}
@@ -87,12 +91,11 @@ export default class Client extends Component {
         {this.state.client.drives.length>=1 ? (
           <Row gutter={16}>
             {this.state.client.drives.map((drive) => (
-              <Col span={5}>
-                <Drive
-                  id={drive._id}
-                  parameters={drive.parameters}
-                  key={drive._id}
-                />
+              <Col span={5}              key={drive.id}>
+                {/* <Element
+                  id={drive.id}
+                  properties={drive.properties}
+                /> */}
               </Col>
             ))}
           </Row>

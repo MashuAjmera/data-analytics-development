@@ -2,15 +2,14 @@ import React, { Component } from "react";
 import { Card } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 
-export default class Drive extends Component {
+export default class Element extends Component {
   state = { name: null };
 
   componentDidMount() {
-    // FETCH uses id to get Name GET /api/drives/<id>
-    // fetch('/api/endpoints/'+this.props.endpoint.id)
+    // fetch('/api/endpoints/'+this.props.endpoint.id) GET /api/endpoints/<id>
     // .then(data=>this.setState({"name":data.name}))
     // .catch(error=>console.log(error))
-    this.setState({ name: "ACS880" });
+    this.setState({ name: "MQTT" });
   }
 
   render() {
@@ -34,9 +33,9 @@ export default class Drive extends Component {
         }}
         bordered={false}
       >
-        {this.props.parameters.map((parameter) => (
-          <p key={parameter._id}>
-            {parameter._id}: {parameter.interval}
+        {this.props.properties.map((property) => (
+          <p key={property.id}>
+            {property.id}: {property.value}
           </p>
         ))}
       </Card>
