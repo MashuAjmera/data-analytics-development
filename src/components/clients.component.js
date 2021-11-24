@@ -17,7 +17,6 @@ export default class Clients extends Component {
   state = {
     clients: [],
     createClientLoading: false,
-    token: null,
     loadClients: false,
   };
 
@@ -48,23 +47,26 @@ export default class Clients extends Component {
   };
 
   createClient = (value) => {
-    this.setState({ createClientLoading: true });
-    // FETCH POST /api/clients/add -> create a blank client
-    fetch("/api/clients/add", {
-      method: 'POST',
-      headers: {
-        Authorization: this.state.token,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name: value }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        message.success("Client Created Successfully.");
-        this.setState({ createClientLoading: false });
-        this.showClients();
+    const token =localStorage.getItem("Authorization");
+    if(token){
+      this.setState({ createClientLoading: true });
+      // FETCH POST /api/clients/add -> create a blank client
+      fetch("/api/clients/add", {
+        method: 'POST',
+        headers: {
+          Authorization: token,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: value }),
       })
-      .catch((error) => message.warning({ content: error }));
+        .then((response) => response.json())
+        .then((data) => {
+          message.success("Client Created Successfully.");
+          this.setState({ createClientLoading: false });
+          this.showClients();
+        })
+        .catch((error) => message.warning({ content: error }));
+    }
     // this.setState({
     //   clients: [...this.state.clients, { id: "4567", name: value }],
     // });
@@ -74,13 +76,28 @@ export default class Clients extends Component {
   render() {
     const { Panel } = Collapse;
     const { Title } = Typography;
-    const genExtra = () => (
+    const genExtra = (_id) => (
       <DeleteOutlined
-        onClick={(event) => {
-          // If you don't want click extra trigger collapse, you can prevent this:
-          event.stopPropagation();
-          // FETCH request to delete
-        }}
+      onClick={(event) => {
+        // If you don't want click extra trigger collapse, you can prevent this:
+        event.stopPropagation();
+        const token = localStorage.getItem("Authorization");
+        if (token) {
+          fetch(
+            `/api/clients/${_id}`,
+            {
+              headers: { Authorization: token },
+              method: "DELETE",
+            }
+          )
+            .then((response) => response.json())
+            .then((data) => {
+              message.success('Client deleted successfully.')
+              this.showClients();
+            })
+            .catch((error) => console.log(error));
+        }
+      }}
       />
     );
 
@@ -109,8 +126,8 @@ export default class Clients extends Component {
           {this.state.loadClients?<div className="example"><Spin size="large" /></div>:this.state.clients.length >= 1 ? (
             <Collapse accordion bordered={false}>
               {this.state.clients.map((client) => (
-                <Panel header={client.name} key={client._id} extra={genExtra()}>
-                  <Client id={client._id} user={this.props.user} />
+                <Panel header={client.name} key={client._id} extra={genExtra(client._id)}>
+                  <Client _id={client._id} user={this.props.user} />
                 </Panel>
               ))}
             </Collapse>

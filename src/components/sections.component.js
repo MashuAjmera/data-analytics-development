@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Select, Form, Input, Spin , message} from "antd";
 
 export default class Sections extends Component {
-  state = { section: null, load: false, token:null };
+  state = { section: null, load: false };
 
   handleChange = (id) => {
     const token = localStorage.getItem("Authorization");
@@ -31,21 +31,7 @@ export default class Sections extends Component {
   };
 
   render() {
-    const onFinishFailed = (errorInfo) => {
-      console.log("Failed:", errorInfo);
-    };
-
-    return (
-        <Form
-          name={this.props.sname}
-          initialValues={{
-            remember: true,
-          }}
-          onFinish={this.props.onOk}
-          labelCol={{ span: 4 }}
-          onFinishFailed={onFinishFailed}
-          autoComplete="off"
-        >
+    return this.props.sections ?<>
           <Form.Item
             label={this.props.sname}
             name="id"
@@ -94,7 +80,9 @@ export default class Sections extends Component {
               </Form.Item>
             ))
           )}
-        </Form>
-    );
+        </>:
+      <div className="example">
+        <Spin size="large" />
+      </div>
   }
 }

@@ -63,12 +63,12 @@ export default class Nav extends Component {
               <Divider
                 type="vertical"
                 style={{
-                  borderLeftColor: "rgb(217, 34, 34)",
+                  borderLeftColor: "#f5222d",
                   height: "2em",
                   marginRight: "11px",
                 }}
               />
-              LogOut
+              Log Out
             </Menu.Item>
           </>
         )}
