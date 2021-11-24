@@ -1,4 +1,5 @@
 from flask import Flask, request, send_from_directory, jsonify, send_file
+from pymongo.message import delete
 import requests
 import pymongo
 from pymongo import mongo_client
@@ -6,6 +7,7 @@ from flask import Blueprint
 from cryptography.fernet import Fernet
 from bson.objectid import ObjectId
 import json
+from routes.driveroute import createDrive, driveList
 from routes.userroute import authorisationcheck
 from pymongo import ReturnDocument
 
@@ -128,7 +130,7 @@ def clientAddDrive():
     else:
         return 'Unauthorised Access',400
 
-@client_route_blueprint.route("/addendpoint", methods = ["GET"])
+@client_route_blueprint.route("/addendpoint", methods = ["POST"])
 def clientAddEndpoint():
     author = request.headers.get('Authorization')
     try:
@@ -178,3 +180,44 @@ def insert(request):
         } for ep in request.endpoints]
     }
     #userData.clients.insert(client)
+
+
+
+
+    
+
+
+
+# /api/clients/add/client
+# get /api/clients/add/clients
+# GET
+
+
+# GET /api/clients/
+# POST /api/clients/<id>
+# PUT /api/clients/<id> /api/clients/<client-id>/drives/<drive-no>
+# DELETE /api/clients/<id>
+
+
+
+
+
+
+
+# 1. for the card
+# drives:[{
+#         id: 
+#         name:
+#         properties:[
+#             {name:"protocol", value:"ModBus"},
+#             {name:"data-points", value:2},
+#         ]
+#     }]
+# 2. harmonize  PUT /api/drives/<drive-id>/parameters/<parameter-id>
+
+# {
+#     name: "new namee"
+# }
+# 3. virtual drive
+# 4. delete
+# 5. edit

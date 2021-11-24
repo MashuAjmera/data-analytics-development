@@ -121,3 +121,19 @@ def insert(request):
         "properties":[{"name": p['name'],"required":p['required'],"type":p["type"]} for p in request.properties],
     }
     #model.endpoints.insert(endpoint)
+
+
+@endpoint_route_blueprint.route("/xyz", methods = ["GET"])
+def endpointxyzbyId():
+    cluster = mongo_client.MongoClient(clusterurl)
+    db = cluster[dbname]
+    collection = db[collectionname]
+    endpoint = {
+    "name": "IoT Hub",
+    "properties": [
+        { "_id":"123","name": "Host", "required": True, "type": "integer" },
+        { "_id":"456","name": "PORT", "required": True, "type": "integer" },
+    ],
+    }
+    collection.insert_one(endpoint)
+    return 'Successful',200

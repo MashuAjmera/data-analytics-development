@@ -51,7 +51,7 @@ def protocolList():
             #resultstr = resultstr.replace('\\',"")
             thisList.append(res)
         #print(thisList)
-        resp = {"endpoints":thisList}
+        resp = {"protocols":thisList}
         return resp,200
     else:
         return 'Unauthorised',400
