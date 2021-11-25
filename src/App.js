@@ -23,8 +23,6 @@ export default class App extends Component {
         .then(response => {
           if(response.ok){
             return response.json();
-          }else {
-            localStorage.removeItem("Authorization");
           }
         }).then(data=>this.setLogin(data))
         .catch(error => message.warning({ content: error }));
