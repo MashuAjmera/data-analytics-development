@@ -1,5 +1,6 @@
 flask
 python-dotenv
+cryptography
 requests
 pymongo
 pymongo[srv]

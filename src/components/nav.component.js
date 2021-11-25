@@ -59,9 +59,9 @@ export default class Nav extends Component {
               
               <Link to="/harmonize">Harmonize</Link>
             </Menu.Item>}
-            <Menu.Item key="drives" icon={<LinkOutlined />}>
+            {['admin','onboarder'].indexOf(this.props.type) !== -1 && <Menu.Item key="drives" icon={<LinkOutlined />}>
               <Link to="/drives">Drives</Link>
-            </Menu.Item>
+            </Menu.Item>}
             <Menu.Item key="gallery" icon={<AppstoreOutlined />}>
               <Link to="/gallery">App Gallery</Link>
             </Menu.Item>

@@ -107,7 +107,7 @@ def clientList():
         db = cluster[dbname]
         collection = db[collectionname]
         #print("request obtained")
-        result = collection.find({},{ "_id": 1, "name": 1})
+        result = collection.find({},{ "_id": 1, "name": 1, "publish": 1})
         #print(result)
         thisList = []
         for x in result:

@@ -10,7 +10,11 @@ import {
   message,
   Input,
 } from "antd";
-import { DeleteOutlined, FolderAddOutlined,PlusOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  FolderAddOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 import Client from "./client.component";
 
 export default class Clients extends Component {
@@ -18,6 +22,7 @@ export default class Clients extends Component {
     clients: [],
     createClientLoading: false,
     loadClients: false,
+    loadPublish:false
   };
 
   componentDidMount() {
@@ -61,7 +66,6 @@ export default class Clients extends Component {
       })
         .then((response) => response.json())
         .then((data) => {
-          
           message.success("Client Created Successfully.");
           this.setState({ createClientLoading: false });
           this.showClients();
@@ -74,42 +78,49 @@ export default class Clients extends Component {
     // this.setState({ createClientLoading: false });
   };
 
+  publish = (_id) => {
+    const token = localStorage.getItem("Authorization");
+    if (token) {
+      this.setState({loadPublish:true})
+      fetch(`/api/clients/publish/${_id}`, {
+        headers: { Authorization: token },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          message.success({ content: "Client published successfully." });
+          this.setState({loadPublish:false});
+        })
+        .catch((error) => console.log(error));
+    }
+  };
+
   render() {
     const { Panel } = Collapse;
     const { Title } = Typography;
-    const genExtra = (_id) => (
-      <>
-        <Button type="text">Publish</Button>
-        <DeleteOutlined
-          onClick={(event) => {
-            // If you don't want click extra trigger collapse, you can prevent this:
-            event.stopPropagation();
-            const token = localStorage.getItem("Authorization");
-            if (token) {
-              const key = "updatable";
-              message.loading({
-                content: "Sending Request...",
-                key,
-                duration: 10,
-              });
-              fetch(`/api/clients/${_id}`, {
-                headers: { Authorization: token },
-                method: "DELETE",
-              })
-                .then((response) => response.json())
-                .then((data) => {
-                  message.success({
-                    content: "Client deleted successfully.",
-                    key,
-                  });
-                  this.showClients();
-                })
-                .catch((error) => console.log(error));
-            }
-          }}
-        />
-      </>
-    );
+    const genExtra = (_id) => {
+      const token = localStorage.getItem("Authorization");
+      if (token) {
+        const key = "updatable";
+        message.loading({
+          content: "Sending Request...",
+          key,
+          duration: 10,
+        });
+        fetch(`/api/clients/${_id}`, {
+          headers: { Authorization: token },
+          method: "DELETE",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            message.success({
+              content: "Client deleted successfully.",
+              key,
+            });
+            this.showClients();
+          })
+          .catch((error) => console.log(error));
+      }
+    };
 
     return (
       <>
@@ -143,7 +154,22 @@ export default class Clients extends Component {
               <Panel
                 header={client.name}
                 key={client._id}
-                extra={genExtra(client._id)}
+                extra={[
+                  client.publish ? (
+                    <Button type="text" disabled>
+                      Published
+                    </Button>
+                  ) : (
+                    <Button
+                      type="text"
+                      onClick={() => this.publish(client._id)}
+                      loading={this.state.loadPublish}
+                    >
+                      Publish
+                    </Button>
+                  ),
+                  <DeleteOutlined onClick={() => genExtra(client._id)} />,
+                ]}
               >
                 <Client _id={client._id} user={this.props.user} />
               </Panel>
