@@ -1,19 +1,20 @@
 import React, { Component } from "react";
-import { Form, Select, Button, Upload, message, Typography, Input,PageHeader } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import { Form, Select, Button, message, Typography, Input, PageHeader, Space } from "antd";
+import { UploadOutlined, ApiOutlined } from "@ant-design/icons";
 import DataPoints from "./dataPoints.component";
 export default class CreateDrive extends Component {
   state = {
-    count:1,
+    count: 1,
     protocols: [],
-    parameters:[],
+    loadButton:false,
+    parameters: [],
     selectedItems: [],
-    loadProtocols:false
+    loadProtocols: false
   };
-  componentDidMount(){
+  componentDidMount() {
     const token = localStorage.getItem("Authorization");
-    if(token){
-      this.setState({loadProtocols:true});
+    if (token) {
+      this.setState({ loadProtocols: true });
       // FETCH name of all the drives GET /api/drives
       fetch("/api/protocols/", {
         headers: { Authorization: token },
@@ -23,15 +24,15 @@ export default class CreateDrive extends Component {
           this.setState({ loadProtocols: false, protocols: data.protocols });
         })
         .catch((error) => message.warning({ content: error }));
+    }
   }
-}
 
   handleChange = (selectedItems) => {
     this.setState({ selectedItems });
   };
 
   handleAdd = () => {
-    const { count, parameters } = this.state;
+    const { count } = this.state;
     const newParameter = {
       key: count,
       _id: count,
@@ -39,9 +40,17 @@ export default class CreateDrive extends Component {
       unit: 'Nm',
     };
     this.setState({
-      parameters: [...parameters, newParameter],
+      parameters: [...this.state.parameters, newParameter],
       count: count + 1,
     });
+  };
+
+  handleFile = e => {
+    const fileReader = new FileReader();
+    fileReader.readAsText(e.target.files[0], "UTF-8");
+    fileReader.onload = e => {
+      this.setState({parameters:JSON.parse(e.target.result)})
+    };
   };
 
   render() {
@@ -57,6 +66,11 @@ export default class CreateDrive extends Component {
         editable: true,
       },
       {
+        title: "Alias",
+        dataIndex: "Alias",
+        editable: true,
+      },
+      {
         title: "Unit",
         dataIndex: "unit",
         editable: true,
@@ -64,35 +78,36 @@ export default class CreateDrive extends Component {
     ];
 
     const onFinish = (values) => {
-      let x={
-        name:values.name,
-        protocols: this.state.selectedItems,
-        parameters: this.state.parameters
+      const token = localStorage.getItem("Authorization");
+      if (token) {
+        this.setState({ loadButton: true });
+        let x = {
+          name: values.name,
+          protocols: this.state.selectedItems.map(item=>({_id:item})),
+          parameters: this.state.parameters
+        }
+        fetch("/api/drives/createdrive", {
+          method: "POST",
+          headers: { Authorization: token, "Content-Type": "application/json" },
+          body: JSON.stringify(x),
+        })
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            }
+          })
+          .then((data) => {
+            this.setState({ loadButton: false });
+            message.success("Drive Created Successfully!");
+          })
+          .catch((error) => message.warning({ content: error }));
       }
-      console.log("Success:", x);
     };
 
     const onFinishFailed = (errorInfo) => {
       console.log("Failed:", errorInfo);
     };
 
-    const props = {
-      name: "file",
-      action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
-      headers: {
-        authorization: "authorization-text",
-      },
-      onChange(info) {
-        if (info.file.status !== "uploading") {
-          console.log(info.file, info.fileList);
-        }
-        if (info.file.status === "done") {
-          message.success(`${info.file.name} file uploaded successfully`);
-        } else if (info.file.status === "error") {
-          message.error(`${info.file.name} file upload failed.`);
-        }
-      },
-    };
     const { Title } = Typography;
     const { selectedItems } = this.state;
     const filteredOptions = this.state.protocols.filter(
@@ -103,10 +118,10 @@ export default class CreateDrive extends Component {
       <Form
         name="basic"
         labelCol={{
-          span: 8,
+          span: 6,
         }}
         wrapperCol={{
-          span: 8,
+          span: 12,
         }}
         initialValues={{
           remember: true,
@@ -116,29 +131,15 @@ export default class CreateDrive extends Component {
         autoComplete="off"
       >
 
-<PageHeader
+        <PageHeader
           className="site-page-header"
           title={<Title level={2}>Create Virtual Drive</Title>}
           extra={[
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" loading={this.state.loadButton} icon={<ApiOutlined />}>
               Create Drive
             </Button>,
           ]}
         />
-        {/* <Form.Item
-          label="Parameter File"
-          name="name"
-          rules={[
-            {
-              required: true,
-              message: "Please input your username!",
-            },
-          ]}
-        >
-          <Upload {...props}>
-            <Button icon={<UploadOutlined />}>Upload JSON</Button>
-          </Upload>
-        </Form.Item> */}
 
         <Form.Item
           label="Name"
@@ -150,7 +151,7 @@ export default class CreateDrive extends Component {
             },
           ]}
         >
-          <Input placeholder="Enter virtual drive name"/>
+          <Input placeholder="Enter virtual drive name" />
         </Form.Item>
         <Form.Item
           label="Protocols"
@@ -164,7 +165,7 @@ export default class CreateDrive extends Component {
         >
           <Select
             mode="multiple"
-            value={selectedItems.map(p=>p.name)}
+            value={selectedItems.map(p => p.name)}
             showSearch
             placeholder={`Select Protocols to Add`}
             optionFilterProp="children"
@@ -183,28 +184,28 @@ export default class CreateDrive extends Component {
         <Form.Item
           label="Parameters"
           name="parameters"
-          rules={[
-            {
-              required: true,
-              message: "Please input your password!",
-            },
-          ]}
         >
-
-        <Button
-         icon={<UploadOutlined />}
-          onClick={this.handleAdd}
-          style={{
-            marginBottom: 16,
-          }}
-        >
-          Add a Parameter
-        </Button>
-        <DataPoints
-          columns={columns}
-          handleClick={this.handleClick}
-          dataSource={this.state.parameters}
-        />
+          <Space>
+            <Button
+              icon={<UploadOutlined />}
+              onClick={this.handleAdd}
+              danger
+              style={{
+                marginBottom: 16,
+              }}
+            >
+              Add a Parameter
+            </Button>
+            {/* <Upload {...props}>
+              <Button icon={<UploadOutlined />}>Upload</Button>
+            </Upload> */}
+            <input type="file" onChange={this.handleFile} id="image_uploads" name="image_uploads" style={{marginTop:"-17px"}} />
+          </Space>
+          <DataPoints
+            columns={columns}
+            handleClick={this.handleClick}
+            dataSource={this.state.parameters}
+          />
         </Form.Item>
       </Form>
     );
