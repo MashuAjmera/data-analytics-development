@@ -6,7 +6,7 @@ import {
   AppstoreOutlined,
   LinkOutlined,
   ApartmentOutlined,
-  FolderOutlined,LogoutOutlined
+  DropboxOutlined,LogoutOutlined
 } from "@ant-design/icons";
 import logo from "../static/logo.png";
 
@@ -52,7 +52,7 @@ export default class Nav extends Component {
         </Menu.Item>
         {this.props.login && (
           <>
-            {['admin','developer'].indexOf(this.props.type) !== -1 && <Menu.Item key="" icon={<FolderOutlined />}>
+            {['admin','developer'].indexOf(this.props.type) !== -1 && <Menu.Item key="" icon={<DropboxOutlined />}>
               <Link to="/">Clients</Link>
             </Menu.Item>}
             {['admin','governer'].indexOf(this.props.type) !== -1 && <Menu.Item key="harmonize" icon={<ApartmentOutlined />}>

@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Typography, Button, message, Form, Input } from "antd";
+import { LoginOutlined } from "@ant-design/icons";
 
 export default class Configure extends Component {
   state = { loading: false };
@@ -48,7 +49,7 @@ export default class Configure extends Component {
         onFinishFailed={this.onFinishFailed}
         autoComplete="off"
       >
-        <Title style={{ textAlign: "center" }}>SignIn to Continue</Title>
+        <Title level={2} style={{ textAlign: "center" }}>SignIn to Continue</Title>
         <Form.Item
           label="Username"
           name="name"
@@ -79,7 +80,7 @@ export default class Configure extends Component {
             span: 16,
           }}
         >
-          <Button type="primary" htmlType="submit" loading={this.state.loading}>
+          <Button type="primary" htmlType="submit" loading={this.state.loading} icon={<LoginOutlined />}>
             Login
           </Button>
         </Form.Item>

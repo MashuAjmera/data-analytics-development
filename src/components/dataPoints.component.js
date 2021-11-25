@@ -164,7 +164,7 @@ export default class DataPoints extends Component {
             columns={columns2}
             dataSource={this.props.dataSource.map(data=>{data.key=data._id; return data;})}
             pagination={false}
-            scroll={{ y: "30em" }}
+            scroll={{ y: "26em" }}
           />
         ) : (
           <div className="example">

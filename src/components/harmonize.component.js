@@ -69,7 +69,7 @@ export default class Harmonize extends Component {
           <Col span={6}>
             <div
               className="site-layout-background"
-              style={{ padding: 24, backgroundColor: "white", height: "37rem" }}
+              style={{ padding: 24, backgroundColor: "white", height: "32rem" }}
             >
             <Typography.Title level={4}>          Select a Drive        </Typography.Title>
               <Drives handleClick={this.handleClick} />
@@ -78,7 +78,7 @@ export default class Harmonize extends Component {
           <Col span={18}>
             <div
               className="site-layout-background"
-              style={{ padding: 24, backgroundColor: "white", height: "37rem" }}
+              style={{ padding: 24, backgroundColor: "white", height: "32rem" }}
             >
             {this.state.empty ?
           <Empty description={<span>No drive selected yet!</span>} style={{marginTop:"10rem"}}/> : <><Typography.Title level={4}> Edit required name</Typography.Title>
