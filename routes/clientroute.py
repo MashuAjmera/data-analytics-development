@@ -100,7 +100,7 @@ def clientList():
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
     if user == 'admin' or user == 'developer':
         
         cluster = mongo_client.MongoClient(clusterurl)
@@ -128,7 +128,7 @@ def addClient():
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
     if user == 'admin' or user == 'developer':
         cluster = mongo_client.MongoClient(clusterurl)
         db = cluster[dbname]
@@ -154,7 +154,7 @@ def clientByid(id):
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
 
     if user == 'admin' or user == 'developer':
         cluster = mongo_client.MongoClient(clusterurl)
@@ -226,7 +226,7 @@ def clientAddDrive():
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
 
     if user == 'admin' or user == 'developer':
         clientid = request.json['clientId']
@@ -251,7 +251,7 @@ def clientpublish(id):
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
 
     if user == 'admin' or user == 'developer':
         
@@ -270,7 +270,7 @@ def publishedClients():
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
 
     if user == 'admin' or user == 'developer':
         clientList = []
@@ -314,7 +314,7 @@ def clientAddEndpoint():
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
 
     if user == 'admin' or user == 'developer':
         clientid = request.json['clientId']
@@ -339,7 +339,7 @@ def deleteclientByid(id):
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
 
     if user == 'admin' or user == 'developer':
         cluster = mongo_client.MongoClient(clusterurl)

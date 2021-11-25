@@ -34,7 +34,7 @@ def protocolList():
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
     if user == 'admin' or user == 'developer':
         
         cluster = mongo_client.MongoClient(clusterurl)
@@ -62,7 +62,7 @@ def createprotocol():
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
     if user == 'admin' or user == 'onboarder':
         cluster = mongo_client.MongoClient(clusterurl)
         db = cluster[dbname]
@@ -99,7 +99,7 @@ def protocolbyId(id):
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
 
     if user == 'admin' or user == 'developer':
         cluster = mongo_client.MongoClient(clusterurl)

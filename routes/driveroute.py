@@ -66,7 +66,7 @@ def driveList():
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
     if user == 'admin' or user == 'developer':
         cluster = mongo_client.MongoClient(clusterurl)
         db = cluster[dbname]
@@ -90,7 +90,7 @@ def drivebyId(id):
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
     if user == 'admin' or user == 'developer':
         cluster = mongo_client.MongoClient(clusterurl)
         db = cluster[dbname]
@@ -123,7 +123,7 @@ def onboardDrive():
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
     if user == 'admin' or user == 'onboarder':
         homedir = os.path.expanduser('~')
         if request.method == 'POST':  
@@ -145,7 +145,7 @@ def createDrive():
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
     if user == 'admin' or user == 'onboarder':
         requestname = request.json['name']
         parameters = request.json['parameters']
@@ -172,7 +172,7 @@ def editdriveparameter(id,paramid):
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
     if user == 'governer' or user == 'admin':
         paramname = request.json['name']
         cluster = mongo_client.MongoClient(clusterurl)
