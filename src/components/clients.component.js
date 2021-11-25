@@ -10,7 +10,7 @@ import {
   message,
   Input,
 } from "antd";
-import { DeleteOutlined, AppstoreAddOutlined } from "@ant-design/icons";
+import { DeleteOutlined, FolderAddOutlined,PlusOutlined } from "@ant-design/icons";
 import Client from "./client.component";
 
 export default class Clients extends Component {
@@ -61,6 +61,7 @@ export default class Clients extends Component {
       })
         .then((response) => response.json())
         .then((data) => {
+          
           message.success("Client Created Successfully.");
           this.setState({ createClientLoading: false });
           this.showClients();
@@ -122,11 +123,11 @@ export default class Clients extends Component {
                   placeholder="input client name"
                   onSearch={this.createClient}
                   loading={this.state.createClientLoading}
-                  enterButton={<AppstoreAddOutlined />}
+                  enterButton={<FolderAddOutlined />}
                 />
               }
             >
-              <Button type="primary" icon={<AppstoreAddOutlined />}>
+              <Button type="primary" icon={<PlusOutlined />}>
                 Create Client
               </Button>
             </Popover>,
