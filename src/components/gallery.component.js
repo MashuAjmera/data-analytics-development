@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Card, Col, Row, Avatar, Rate } from "antd";
-import { SmileOutlined } from "@ant-design/icons";
+import { SmileOutlined, CloudDownloadOutlined, EllipsisOutlined } from "@ant-design/icons";
 
 export default class AppGallery extends Component {
   render() {
@@ -55,7 +55,11 @@ export default class AppGallery extends Component {
         <Row gutter={64}>
           {data.map((d) => (
             <Col span={6}>
-              <Card style={{marginTop: 16 }}>
+              <Card style={{marginTop: 16 }}
+          actions={[
+            <CloudDownloadOutlined key="download" />,
+            <EllipsisOutlined key="ellipsis" />,
+          ]}>
                 <Card.Meta
                   avatar={d.avatar}
                   title={d.title}
