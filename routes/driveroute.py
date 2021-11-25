@@ -82,7 +82,7 @@ def driveList():
         resp = {"drives":thisList}
         return resp,200
     else:
-        return 'Unauthorised Access',401
+        return jsonify('Unauthorised Access'),401
 
 @drive_route_blueprint.route("/<id>", methods = ["GET"])
 def drivebyId(id):
@@ -133,11 +133,11 @@ def onboardDrive():
             protoList = request.json['protocols']
             ret = insertDrive(finalpath,protoList)
         if ret == 1:
-            return 'Successful',200
+            return jsonify('Successful'),200
         else:
-            return 'Unsuccessful',400
+            return jsonify('Unsuccessful'),400
     else:
-        return 'Unauthorised Access',401
+        return jsonify('Unauthorised Access'),401
 
 @drive_route_blueprint.route("/createdrive", methods = ["POST"])
 def createDrive():
