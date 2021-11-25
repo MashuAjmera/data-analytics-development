@@ -1,71 +1,94 @@
 import React, { Component } from "react";
-import { Card, Col, Row, Avatar, Rate } from "antd";
-import { SmileOutlined } from "@ant-design/icons";
+import { Card, Col, Row, Avatar, Rate, Spin,message } from "antd";
+import {  CloudDownloadOutlined, EllipsisOutlined } from "@ant-design/icons";
+import logo from "../static/favicon.png";
 
 export default class AppGallery extends Component {
+  state={apps:[],loadClients:false}
+  componentDidMount(){
+    const token = localStorage.getItem("Authorization");
+    if (token) {
+      this.setState({ loadClients: true });
+      // FETCH GET /api/clients/ <- all client names
+      fetch("/api/clients/published", {
+        headers: { Authorization: token },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          this.setState({ loadClients: false, apps: data });
+        })
+        .catch((error) => message.warning({ content: error }));
+  }
+}
   render() {
-    const data = [
-        {
-          avatar: <SmileOutlined />,
-          title: "ABB Client",
-          description: (
-            <>
-              <p>endpoints: modbus, opcua</p>
-              <p>drives: ACS800</p>
-              <Rate disabled defaultValue={4} />
-            </>
-          ),
-        },
-        {
-          avatar: <Avatar src="https://joeschmoe.io/api/v1/random" />,
-          title: "ABB Client",
-          description: (
-            <>
-              <p>endpoints: modbus, opcua</p>
-              <p>drives: ACS800</p>
-              <Rate disabled defaultValue={4} />
-            </>
-          ),
-        },
-        {
-          avatar: <Avatar src="https://joeschmoe.io/api/v1/random" />,
-          title: "ABB Client",
-          description: (
-            <>
-              <p>endpoints: modbus, opcua</p>
-              <p>drives: ACS800</p>
-              <Rate disabled defaultValue={4} />
-            </>
-          ),
-        },
-        {
-          avatar: <Avatar src="https://joeschmoe.io/api/v1/random" />,
-          title: "ABB Client",
-          description: (
-            <>
-              <p>endpoints: modbus, opcua</p>
-              <p>drives: ACS800</p>
-              <Rate disabled defaultValue={4} />
-            </>
-          ),
-        },
-    ];
-    return (
+    // const data = [
+    //     {
+    //       avatar: <SmileOutlined />,
+    //       title: "ABB Client",
+    //       description: (
+    //         <>
+    //           <p>endpoints: modbus, opcua</p>
+    //           <p>drives: ACS800</p>
+    //           <Rate disabled defaultValue={4} />
+    //         </>
+    //       ),
+    //     },
+    //     {
+    //       avatar: <Avatar src="https://joeschmoe.io/api/v1/random" />,
+    //       title: "ABB Client",
+    //       description: (
+    //         <>
+    //           <p>endpoints: modbus, opcua</p>
+    //           <p>drives: ACS800</p>
+    //           <Rate disabled defaultValue={4} />
+    //         </>
+    //       ),
+    //     },
+    //     {
+    //       avatar: <Avatar src="https://joeschmoe.io/api/v1/random" />,
+    //       title: "ABB Client",
+    //       description: (
+    //         <>
+    //           <p>endpoints: modbus, opcua</p>
+    //           <p>drives: ACS800</p>
+    //           <Rate disabled defaultValue={4} />
+    //         </>
+    //       ),
+    //     },
+    //     {
+    //       avatar: <Avatar src="https://joeschmoe.io/api/v1/random" />,
+    //       title: "ABB Client",
+    //       description: (
+    //         <>
+    //           <p>endpoints: modbus, opcua</p>
+    //           <p>drives: ACS800</p>
+              
+    //         </>
+    //       ),
+    //     },
+    // ];
+    return this.state.loadClients?
+    <div className="example">
+      <Spin size="large" />
+    </div>:
       <div className="site-card-wrapper">
-        <Row gutter={64}>
-          {data.map((d) => (
+        <Row gutter={64} justify="center">
+          {this.state.apps.map((d) => (
             <Col span={6}>
-              <Card style={{marginTop: 16 }}>
+              <Card style={{marginTop: 16 }}
+          actions={[
+            <CloudDownloadOutlined key="download" />,
+            <EllipsisOutlined key="ellipsis" />,
+          ]}>
                 <Card.Meta
-                  avatar={d.avatar}
-                  title={d.title}
-                  description={d.description}
+                  avatar={<Avatar src={logo} />}
+                  title={d.name}
+                  description={<><p>endpoints: {d.endpoints.map(e=>e+", ")}</p><p>drives: {d.drives.map(e=>e+", ")}</p><Rate disabled defaultValue={4} /></>}
                 />
               </Card>
             </Col>
           ))}
         </Row>
       </div>
-    );
   }
 }

@@ -97,7 +97,7 @@ export default class Client extends Component {
           <Row gutter={16}>
             {this.state.client.drives.map((drive) => (
               <Col span={5} key={drive._id}>
-                <Element element={drive}/>
+                <Element element={drive} clientId={this.props._id} setClient={this.setClient} ename={"drive"}/>
               </Col>
             ))}
           </Row>
