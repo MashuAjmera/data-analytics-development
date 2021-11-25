@@ -34,7 +34,7 @@ def protocolList():
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
     if user == 'admin' or user == 'developer':
         
         cluster = mongo_client.MongoClient(clusterurl)
@@ -54,7 +54,7 @@ def protocolList():
         resp = {"protocols":thisList}
         return resp,200
     else:
-        return 'Unauthorised',400
+        return jsonify('Unauthorised Access'),401
 
 @protocol_route_blueprint.route("/createprotocol", methods = ["POST","GET"])
 def createprotocol():
@@ -62,7 +62,7 @@ def createprotocol():
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
     if user == 'admin' or user == 'onboarder':
         cluster = mongo_client.MongoClient(clusterurl)
         db = cluster[dbname]
@@ -87,11 +87,11 @@ def createprotocol():
         existingClientlen = len(str(returnExistingprotocol(request.json['name'])))
         if existingClientlen < 5:
             collection.insert_one(protocol)
-            return 'Successful',200
+            return jsonify('Successful'),200
         else:
-            return 'Endpoint already exists',400
+            return jsonify('Endpoint already exists'),400
     else:
-        return 'Unauthorised Access',400
+        return jsonify('Unauthorised Access'),401
 
 @protocol_route_blueprint.route("/<id>", methods = ["GET"])
 def protocolbyId(id):
@@ -99,7 +99,7 @@ def protocolbyId(id):
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
 
     if user == 'admin' or user == 'developer':
         cluster = mongo_client.MongoClient(clusterurl)
@@ -110,7 +110,7 @@ def protocolbyId(id):
         resp = json.loads(result)
         return resp,200
     else:
-        return 'Unauthorised Access',400
+        return jsonify('Unauthorised Access'),401
 
 def insert(request):
     protocol={

@@ -62,7 +62,10 @@ def returnexistingclientbyid(id):
         for prop in endpoint['properties']:
             for proper in resultendpoint2['properties']:
                 if prop['_id'] == proper['_id']:
-                    propertiesListItem = {"_id":prop['_id'],"name":proper['name'],"value":prop['value']}
+                    try:
+                        propertiesListItem = {"_id":prop['_id'],"name":proper['name'],"value":prop['value']}
+                    except:
+                        propertiesListItem = {"_id":prop['_id'],"name":proper['name'],"value":""}
                     propertiesList.append(propertiesListItem)
                     break
         #print(resultendpoint2)
@@ -97,7 +100,7 @@ def clientList():
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
     if user == 'admin' or user == 'developer':
         
         cluster = mongo_client.MongoClient(clusterurl)
@@ -125,7 +128,7 @@ def addClient():
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
     if user == 'admin' or user == 'developer':
         cluster = mongo_client.MongoClient(clusterurl)
         db = cluster[dbname]
@@ -133,16 +136,17 @@ def addClient():
         client = {
             "name": request.json['name'],
             "drives":[],
-            "endpoints":[]
+            "endpoints":[],
+            "publish":False
         }
         existingClientlen = len(str(returnExistingclient(request.json['name'])))
         if existingClientlen < 5:
             collection.insert_one(client)
             return jsonify('Successful'),200
         else:
-            return 'Client already exists',400
+            return jsonify('Client already exists'),400
     else:
-        return 'Unauthorised Access',401
+        return jsonify('Unauthorised Access'),401
 
 @client_route_blueprint.route("/<id>", methods = ["GET"])
 def clientByid(id):
@@ -150,7 +154,7 @@ def clientByid(id):
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
 
     if user == 'admin' or user == 'developer':
         cluster = mongo_client.MongoClient(clusterurl)
@@ -191,7 +195,10 @@ def clientByid(id):
             for prop in endpoint['properties']:
                 for proper in resultendpoint2['properties']:
                     if prop['_id'] == proper['_id']:
-                        propertiesListItem = {"_id":prop['_id'],"name":proper['name'],"value":prop['value']}
+                        try:
+                            propertiesListItem = {"_id":prop['_id'],"name":proper['name'],"value":prop['value']}
+                        except:
+                            propertiesListItem = {"_id":prop['_id'],"name":proper['name'],"value":""}
                         propertiesList.append(propertiesListItem)
                         break
             #print(resultendpoint2)
@@ -211,7 +218,7 @@ def clientByid(id):
         }
         return {"client": responsefinal},200
     else:
-        return 'Unauthorised Access',400
+        return jsonify('Unauthorised Access'),401
 
 @client_route_blueprint.route("/adddrive", methods = ["GET","POST"])
 def clientAddDrive():
@@ -219,7 +226,7 @@ def clientAddDrive():
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
 
     if user == 'admin' or user == 'developer':
         clientid = request.json['clientId']
@@ -236,7 +243,70 @@ def clientAddDrive():
         resp = returnexistingclientbyid(clientid)
         return resp,200
     else:
-        return 'Unauthorised Access',400
+        return jsonify('Unauthorised Access'),401
+
+@client_route_blueprint.route("/publish/<id>", methods = ["GET"])
+def clientpublish(id):
+    author = request.headers.get('Authorization')
+    try:
+        user = authorisationcheck(author)
+    except:
+        return jsonify('Invalid Token'),401
+
+    if user == 'admin' or user == 'developer':
+        
+        cluster = mongo_client.MongoClient(clusterurl)
+        db = cluster[dbname]
+        collection = db[collectionname]
+        updateresult = collection.find_one_and_update({'_id':ObjectId(id)},{ '$set': { "publish" : True}}, return_document = ReturnDocument.AFTER)
+        
+        return jsonify('Successful'),200
+    else:
+        return jsonify('Unauthorised Access'),401
+
+@client_route_blueprint.route("/published", methods = ["GET"])
+def publishedClients():
+    author = request.headers.get('Authorization')
+    try:
+        user = authorisationcheck(author)
+    except:
+        return jsonify('Invalid Token'),401
+
+    if user == 'admin' or user == 'developer':
+        clientList = []
+        cluster = mongo_client.MongoClient(clusterurl)
+        db = cluster[dbname]
+        collection = db[collectionname]  
+        infoDb = cluster['informationModel']
+        collectionDrives = infoDb['drives']
+        collectionEndpoint = infoDb['endpoints']      
+        queryresults = collection.find({"publish":True})
+        for queryresult in queryresults:
+            queryresult1 = JSONEncoder().encode(queryresult)
+            queryresult2 = json.loads(queryresult1)
+            driveLists = []
+            endpointLists = []
+            for drive in queryresult2['drives']:
+                resultdrive = collectionDrives.find_one({"_id":ObjectId(drive['_id'])})
+                resultdrive1 = JSONEncoder().encode(resultdrive)
+                resultdrive2 = json.loads(resultdrive1)
+                driveLists.append(resultdrive2['name'])
+            for endpoint in queryresult2['endpoints']:
+                resultendpoint = collectionEndpoint.find_one({"_id":ObjectId(endpoint['_id'])})
+                resultendpoint1 = JSONEncoder().encode(resultendpoint)
+                resultendpoint2 = json.loads(resultendpoint1)
+                endpointLists.append(resultendpoint2['name'])
+
+            client = {
+                "name":queryresult2['name'],
+                "drives":driveLists,
+                "endpoints":endpointLists
+            }
+            clientList.append(client)
+        
+        return jsonify(clientList),200
+    else:
+        return jsonify('Unauthorised Access'),401
 
 @client_route_blueprint.route("/addendpoint", methods = ["POST"])
 def clientAddEndpoint():
@@ -244,7 +314,7 @@ def clientAddEndpoint():
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
 
     if user == 'admin' or user == 'developer':
         clientid = request.json['clientId']
@@ -261,7 +331,7 @@ def clientAddEndpoint():
         resp = returnexistingclientbyid(clientid)
         return resp,200
     else:
-        return 'Unauthorised Access',400
+        return jsonify('Unauthorised Access'),401
 
 @client_route_blueprint.route("/<id>", methods = ["DELETE"])
 def deleteclientByid(id):
@@ -269,7 +339,7 @@ def deleteclientByid(id):
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
 
     if user == 'admin' or user == 'developer':
         cluster = mongo_client.MongoClient(clusterurl)
@@ -279,7 +349,7 @@ def deleteclientByid(id):
         
         return jsonify('Deleted Successfully'),200
     else:
-        return 'Unauthorised Access',400
+        return jsonify('Unauthorised Access'),401
 
 @client_route_blueprint.route("/<id>/deleteendpoint/<endpointid>", methods = ["DELETE"])
 def clientdeleteEndpoint(id,endpointid):
@@ -287,7 +357,7 @@ def clientdeleteEndpoint(id,endpointid):
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
 
     if user == 'admin' or user == 'developer':
         #clientid = request.json['clientId']
@@ -303,14 +373,14 @@ def clientdeleteEndpoint(id,endpointid):
             if endpoint['_id'] != endpointid:
                 thisList.append(endpoint)
 
-        thisList.append(endpoint)
+        
         resultraw = collection.find_one_and_update({'_id':ObjectId(id)},{ '$set': { "endpoints" : thisList}}, return_document = ReturnDocument.AFTER)
         resp = returnexistingclientbyid(id)
         return resp,200
         
-        return resp,200
+        
     else:
-        return 'Unauthorised Access',400
+        return jsonify('Unauthorised Access'),401
 
 @client_route_blueprint.route("/<id>/deletedrive/<driveid>", methods = ["DELETE"])
 def clientdeleteDrive(id,driveid):
@@ -318,7 +388,7 @@ def clientdeleteDrive(id,driveid):
     try:
         user = authorisationcheck(author)
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),401
 
     if user == 'admin' or user == 'developer':
         #clientid = request.json['clientId']
@@ -337,9 +407,9 @@ def clientdeleteDrive(id,driveid):
         resp = returnexistingclientbyid(id)
         return resp,200
         
-        return resp,200
+        
     else:
-        return 'Unauthorised Access',400
+        return jsonify('Unauthorised Access'),401
 
 def insert(request):
     client={
