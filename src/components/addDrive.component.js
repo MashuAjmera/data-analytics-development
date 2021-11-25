@@ -188,7 +188,7 @@ export default class AddDrive extends Component {
             Modify the code below or{" "}
             <Button
               type="link"
-              href="http://localhost:8000"
+              href="http://localhost:8000/red"
               target="_blank"
               size="small"
             >

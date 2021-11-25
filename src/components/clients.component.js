@@ -8,6 +8,7 @@ import {
   Empty,
   Popover,
   message,
+  Tooltip,
   Input,
 } from "antd";
 import {
@@ -168,7 +169,7 @@ export default class Clients extends Component {
                       Publish
                     </Button>
                   ),
-                  <DeleteOutlined onClick={() => genExtra(client._id)} />,
+                  <Tooltip title="Click to delete client"><DeleteOutlined onClick={() => genExtra(client._id)} /></Tooltip>,
                 ]}
               >
                 <Client _id={client._id} user={this.props.user} />
