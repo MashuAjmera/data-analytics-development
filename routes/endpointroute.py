@@ -54,7 +54,7 @@ def endpointList():
         resp = {"endpoints":thisList}
         return resp,200
     else:
-        return 'Unauthorised',400
+        return jsonify('Unauthorised Access'),401
 
 @endpoint_route_blueprint.route("/createendpoint", methods = ["POST","GET"])
 def createEndpoint():
@@ -90,11 +90,11 @@ def createEndpoint():
         existingClientlen = len(str(returnExistingendpoint(request.json['name'])))
         if existingClientlen < 5:
             collection.insert_one(endpoint)
-            return 'Successful',200
+            return jsonify('Successful'),200
         else:
-            return 'Endpoint already exists',400
+            return jsonify('Endpoint already exists'),400
     else:
-        return 'Unauthorised Access',400
+        return jsonify('Unauthorised Access'),401
 
 @endpoint_route_blueprint.route("/<id>", methods = ["GET"])
 def endpointbyId(id):
@@ -113,7 +113,7 @@ def endpointbyId(id):
         resp = json.loads(result)
         return resp,200
     else:
-        return 'Unauthorised Access',400
+        return jsonify('Unauthorised Access'),401
 
 def insert(request):
     endpoint={
@@ -136,4 +136,4 @@ def endpointxyzbyId():
     ],
     }
     collection.insert_one(endpoint)
-    return 'Successful',200
+    return jsonify('Successful'),200

@@ -82,7 +82,7 @@ def driveList():
         resp = {"drives":thisList}
         return resp,200
     else:
-        return 'Unauthorised Access',400
+        return 'Unauthorised Access',401
 
 @drive_route_blueprint.route("/<id>", methods = ["GET"])
 def drivebyId(id):
@@ -115,10 +115,10 @@ def drivebyId(id):
 
         return {"drive":resp},200
     else:
-        return 'Unauthorised Access',400
+        return jsonify('Unauthorised Access'),401
 
-@drive_route_blueprint.route("/createdrive", methods = ["POST"])
-def createDrive():
+@drive_route_blueprint.route("/onboarddrive", methods = ["POST"])
+def onboardDrive():
     author = request.headers.get('Authorization')
     try:
         user = authorisationcheck(author)
@@ -137,7 +137,34 @@ def createDrive():
         else:
             return 'Unsuccessful',400
     else:
-        return 'Unauthorised Access',400
+        return 'Unauthorised Access',401
+
+@drive_route_blueprint.route("/createdrive", methods = ["POST"])
+def createDrive():
+    author = request.headers.get('Authorization')
+    try:
+        user = authorisationcheck(author)
+    except:
+        return 'Invalid Token',400
+    if user == 'admin' or user == 'onboarder':
+        requestname = request.json['name']
+        parameters = request.json['parameters']
+        protocols = request.json['protocols']
+        drive = {
+            "name":requestname,
+            "parameters":parameters,
+            "protocols":protocols
+        }
+        cluster = mongo_client.MongoClient(clusterurl)
+        db = cluster[dbname]
+        collection = db[collectionname]
+
+        collection.insert_one(drive)
+
+        return jsonify('Successful'),200
+
+    else:
+        return jsonify('Unauthorised Access'),401
 
 @drive_route_blueprint.route("/<id>/parameters/<paramid>", methods = ["PUT"])
 def editdriveparameter(id,paramid):
@@ -169,7 +196,7 @@ def editdriveparameter(id,paramid):
 
         return jsonify('Successfully Updated'),200
     else:
-        return 'Unauthorised Access',400
+        return jsonify('Unauthorised Access'),401
 
 
 def insert(request):
