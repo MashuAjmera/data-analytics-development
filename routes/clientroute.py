@@ -116,7 +116,7 @@ def clientList():
         #print(thisList)
         return {"clients":thisList},200
     else:
-        return 'Unauthorised',400
+        return jsonify('Unauthorised'),400
      
 
 @client_route_blueprint.route("/add", methods = ["POST"])
@@ -138,7 +138,7 @@ def addClient():
         existingClientlen = len(str(returnExistingclient(request.json['name'])))
         if existingClientlen < 5:
             collection.insert_one(client)
-            return 'Successful',200
+            return jsonify('Successful'),200
         else:
             return 'Client already exists',400
     else:
@@ -277,7 +277,7 @@ def deleteclientByid(id):
         collection = db[collectionname]
         collection.delete_one({"_id":ObjectId(id)})
         
-        return 'Deleted Successfully',200
+        return jsonify('Deleted Successfully'),200
     else:
         return 'Unauthorised Access',400
 

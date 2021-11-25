@@ -54,7 +54,7 @@ def checkUser():
         user = authorisationcheck(author)
         return {"token":author,"type":user},200
     except:
-        return 'Invalid Token',400
+        return jsonify('Invalid Token'),400
     
 
 @user_route_blueprint.route("/login", methods = ["POST","GET"])
@@ -71,8 +71,7 @@ def login():
         return resp,200
         #return {"code":2,"message":"Login Successful","type":entry["type"]}
     else:
-        resp = 'Invalid Username or Password'
-        return resp,400
+        return jsonify('Invalid Username or Password'),400
         #return {"code":4,"message":"Invalid username or password"}
 
 @user_route_blueprint.route("/signup", methods = ["POST","GET"])
@@ -91,10 +90,10 @@ def signup():
     existingUserlen = len(str(returnExistingUser(request.json['name'])))
     if existingUserlen < 5:
         collection.insert_one(user)
-        return 'Successful',200
+        return jsonify('Successful'),200
         #return {"code":2,"message":"Signup Successful"}
     else:
-        return 'User already exist',400
+        return jsonify('User already exist'),400
         #return {"code":4,"message":"User already exist"}
 
 

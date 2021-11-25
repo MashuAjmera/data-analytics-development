@@ -167,7 +167,7 @@ def editdriveparameter(id,paramid):
                 parameterList.append(parameter)
         resultraw = collection.find_one_and_update({'_id':ObjectId(id)},{ '$set': { "parameters" : parameterList}}, return_document = ReturnDocument.AFTER)
 
-        return 'Successfully Updated',200
+        return jsonify('Successfully Updated'),200
     else:
         return 'Unauthorised Access',400
 
