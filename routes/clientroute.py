@@ -62,7 +62,10 @@ def returnexistingclientbyid(id):
         for prop in endpoint['properties']:
             for proper in resultendpoint2['properties']:
                 if prop['_id'] == proper['_id']:
-                    propertiesListItem = {"_id":prop['_id'],"name":proper['name'],"value":prop['value']}
+                    try:
+                        propertiesListItem = {"_id":prop['_id'],"name":proper['name'],"value":prop['value']}
+                    except:
+                        propertiesListItem = {"_id":prop['_id'],"name":proper['name'],"value":""}
                     propertiesList.append(propertiesListItem)
                     break
         #print(resultendpoint2)
@@ -192,7 +195,10 @@ def clientByid(id):
             for prop in endpoint['properties']:
                 for proper in resultendpoint2['properties']:
                     if prop['_id'] == proper['_id']:
-                        propertiesListItem = {"_id":prop['_id'],"name":proper['name'],"value":prop['value']}
+                        try:
+                            propertiesListItem = {"_id":prop['_id'],"name":proper['name'],"value":prop['value']}
+                        except:
+                            propertiesListItem = {"_id":prop['_id'],"name":proper['name'],"value":""}
                         propertiesList.append(propertiesListItem)
                         break
             #print(resultendpoint2)
