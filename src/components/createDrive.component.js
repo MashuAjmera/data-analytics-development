@@ -125,7 +125,6 @@ export default class CreateDrive extends Component {
             </Button>,
           ]}
         />
-        {/* <Title level={2} style={{ textAlign: "center" }}>Create your Virtual Drive</Title> */}
         {/* <Form.Item
           label="Parameter File"
           name="name"
