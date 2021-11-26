@@ -259,8 +259,17 @@ def clientpublish(id):
         db = cluster[dbname]
         collection = db[collectionname]
         updateresult = collection.find_one_and_update({'_id':ObjectId(id)},{ '$set': { "publish" : True}}, return_document = ReturnDocument.AFTER)
-        
-        return jsonify('Successful'),200
+        result = collection.find({},{ "_id": 1, "name": 1, "publish": 1})
+        #print(result)
+        thisList = []
+        for x in result:
+            resultstr = JSONEncoder().encode(x)
+            res = json.loads(resultstr)
+            #print(res)
+            #resultstr = resultstr.replace('\\',"")
+            thisList.append(res)
+        #print(thisList)
+        return {"clients":thisList},200
     else:
         return jsonify('Unauthorised Access'),401
 

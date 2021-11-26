@@ -52,7 +52,8 @@ def insertDrive(path,protocolList):
         drivedata = {
             "name":dname,
             "parameters":thislist,
-            "protocols": protocolList
+            "protocols": protocolList,
+            "approved":False
         }
         collection.insert_one(drivedata)
         return 1
@@ -67,11 +68,35 @@ def driveList():
         user = authorisationcheck(author)
     except:
         return jsonify('Invalid Token'),401
+    if user == 'governer' or user == 'onboarder':
+        cluster = mongo_client.MongoClient(clusterurl)
+        db = cluster[dbname]
+        collection = db[collectionname]
+        result = collection.find({},{ "_id": 1, "name": 1,"approved":1})
+        thisList = []
+        for x in result:
+            resultstr = JSONEncoder().encode(x)
+            res = json.loads(resultstr)
+            #print(res)
+            #resultstr = resultstr.replace('\\',"")
+            thisList.append(res)
+        resp = {"drives":thisList}
+        return resp,200
+    else:
+        return jsonify('Unauthorised Access'),401
+
+@drive_route_blueprint.route("/approved", methods = ["GET"])
+def approvedDriveList():
+    author = request.headers.get('Authorization')
+    try:
+        user = authorisationcheck(author)
+    except:
+        return jsonify('Invalid Token'),401
     if user == 'admin' or user == 'developer':
         cluster = mongo_client.MongoClient(clusterurl)
         db = cluster[dbname]
         collection = db[collectionname]
-        result = collection.find({},{ "_id": 1, "name": 1})
+        result = collection.find({"approved":True},{"_id": 1, "name": 1})
         thisList = []
         for x in result:
             resultstr = JSONEncoder().encode(x)
@@ -117,6 +142,24 @@ def drivebyId(id):
     else:
         return jsonify('Unauthorised Access'),401
 
+@drive_route_blueprint.route("/getapproval/<id>", methods = ["GET"])
+def approveDrive(id):
+    author = request.headers.get('Authorization')
+    try:
+        user = authorisationcheck(author)
+    except:
+        return jsonify('Invalid Token'),401
+    if user == 'governer' or user == 'admin':
+        cluster = mongo_client.MongoClient(clusterurl)
+        db = cluster[dbname]
+        collection = db[collectionname]
+        
+        updateresult = collection.find_one_and_update({'_id':ObjectId(id)},{ '$set': { "approved" : True}}, return_document = ReturnDocument.AFTER)
+        
+        return jsonify('Successful'),200
+    else:
+        return jsonify('Unauthorised Access'),401
+
 @drive_route_blueprint.route("/onboarddrive", methods = ["POST"])
 def onboardDrive():
     author = request.headers.get('Authorization')
@@ -153,7 +196,8 @@ def createDrive():
         drive = {
             "name":requestname,
             "parameters":parameters,
-            "protocols":protocols
+            "protocols":protocols,
+            "approved":False
         }
         cluster = mongo_client.MongoClient(clusterurl)
         db = cluster[dbname]
