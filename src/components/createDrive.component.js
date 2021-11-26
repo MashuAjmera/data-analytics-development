@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import { Form, Select, Button, message, Typography, Input, PageHeader, Space } from "antd";
+import { Form, Select, Button, message, Typography, Input, PageHeader, Space, Row, Col } from "antd";
 import { UploadOutlined, ApiOutlined } from "@ant-design/icons";
 import DataPoints from "./dataPoints.component";
+import Drives from "./drives.component";
 export default class CreateDrive extends Component {
   state = {
     count: 1,
@@ -114,7 +115,16 @@ export default class CreateDrive extends Component {
       (protocol) => !selectedItems.includes(protocol)
     );
 
-    return (
+    return (<Row gutter={16}>
+      <Col span={6}>
+        <div
+          className="site-layout-background"
+          style={{ padding: 24, backgroundColor: "white", height: "36rem" }}
+        >
+          <Drives handleClick={this.handleClick} />
+        </div>
+      </Col>
+      <Col span={18}>
       <Form
         name="basic"
         labelCol={{
@@ -131,16 +141,17 @@ export default class CreateDrive extends Component {
         autoComplete="off"
       >
 
-        <PageHeader
+        {/* <PageHeader
           className="site-page-header"
-          title={<Title level={2}>Create Virtual Drive</Title>}
+          title={<Title level={2}>Onboard your drives</Title>}
           extra={[
             <Button type="primary" htmlType="submit" loading={this.state.loadButton} icon={<ApiOutlined />}>
               Create Drive
             </Button>,
           ]}
-        />
+        /> */}
 
+<Title level={2} style={{ textAlign: "center" }}>Onboard New Drive</Title>
         <Form.Item
           label="Name"
           name="name"
@@ -207,7 +218,16 @@ export default class CreateDrive extends Component {
             dataSource={this.state.parameters}
           />
         </Form.Item>
-      </Form>
+        <Form.Item
+          wrapperCol={{
+            offset: 6,
+          }}
+        >
+            <Button type="primary" htmlType="submit" loading={this.state.loadButton} icon={<ApiOutlined />}>
+              Create Drive
+            </Button>
+        </Form.Item>
+      </Form></Col></Row>
     );
   }
 }
