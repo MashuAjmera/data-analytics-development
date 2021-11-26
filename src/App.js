@@ -45,22 +45,24 @@ export default class App extends Component {
     return (
       <BrowserRouter>
       <Layout>
-        <Header>
+        <Header style={{ position: 'fixed', zIndex: 1, width: '100%' }}>
           <Nav login={this.state.login} logOut={this.logOut} type={this.state.login && this.state.user.type}/>
         </Header>
         <Content
           style={{
-            padding: "50px 50px 0px 50px",
-            minHeight: "calc(100vh - 18vh)",
+            padding: "100px 50px 0px 50px",
+            minHeight: "calc(100vh - 9.9vh)",
+
           }}
         >
           {this.state.login ? (
             <Switch>
-              <Route path="/" exact render={(props) => (<Clients user={this.state.user} />)}/>
+            <Route path="/" exact component={AppGallery} />
+              <Route path="/gallery" component={AppGallery} />
               <Route path="/harmonize" component={Harmonize} />
               <Route path="/drives" component={CreateDrive} />
-              <Route path="/gallery" component={AppGallery} />
-              <Route component={"Overview"} />
+              <Route path="/develop" render={(props) => (<Clients user={this.state.user} />)}/>
+              <Route component={AppGallery} />
             </Switch>
           ) : (
             <>

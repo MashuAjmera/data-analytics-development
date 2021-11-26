@@ -6,7 +6,8 @@ import {
   AppstoreOutlined,
   LinkOutlined,
   ApartmentOutlined,
-  DropboxOutlined,LogoutOutlined
+  DropboxOutlined,LogoutOutlined,
+  CrownOutlined
 } from "@ant-design/icons";
 import logo from "../static/logo.png";
 
@@ -52,21 +53,21 @@ export default class Nav extends Component {
         </Menu.Item>
         {this.props.login && (
           <>
-            {['admin','developer'].indexOf(this.props.type) !== -1 && <Menu.Item key="" icon={<DropboxOutlined />}>
-              <Link to="/">Clients</Link>
+            <Menu.Item key="" icon={<AppstoreOutlined />}>
+              <Link to="/">App Gallery</Link>
+            </Menu.Item>
+            {['admin','developer'].indexOf(this.props.type) !== -1 && <Menu.Item key="develop" icon={<DropboxOutlined />}>
+              <Link to="/develop">Develop</Link>
             </Menu.Item>}
             {['admin','governer'].indexOf(this.props.type) !== -1 && <Menu.Item key="harmonize" icon={<ApartmentOutlined />}>
               
               <Link to="/harmonize">Harmonize</Link>
             </Menu.Item>}
             {['admin','onboarder'].indexOf(this.props.type) !== -1 && <Menu.Item key="drives" icon={<LinkOutlined />}>
-              <Link to="/drives">Drives</Link>
+              <Link to="/drives">Onboard</Link>
             </Menu.Item>}
-            <Menu.Item key="gallery" icon={<AppstoreOutlined />}>
-              <Link to="/gallery">App Gallery</Link>
-            </Menu.Item>
             <SubMenu key="user" icon={<UserOutlined />} title="Profile">
-            <Menu.Item key="5">{this.props.type} account</Menu.Item>
+            <Menu.Item key="5" icon={<CrownOutlined />}>{this.props.type} account</Menu.Item>
             <Menu.Item key="6" onClick={this.props.logOut} icon={<LogoutOutlined />}>
               logout
             </Menu.Item>
