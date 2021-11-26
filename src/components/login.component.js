@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { Typography, Button, message, Form, Input } from "antd";
-import { LoginOutlined } from "@ant-design/icons";
+import { Typography, Button, message, Form, Input, Row, Col, Statistic, Layout, Space } from "antd";
+import { LoginOutlined,TeamOutlined,AppstoreOutlined,SolutionOutlined,LinkOutlined } from "@ant-design/icons";
 
 export default class Configure extends Component {
   state = { loading: false };
@@ -34,6 +34,18 @@ export default class Configure extends Component {
     const { Title } = Typography;
 
     return (
+    <Layout>
+    <Row gutter={16}>
+      <Col span={8} style={{padding:"100px 160px"}}>
+        <Space direction="vertical" size="large">
+        <Statistic title="Customers" value={"4000+"} prefix={<TeamOutlined />}/>
+        <Statistic title="Apps" value={"2 Million+"} prefix={<AppstoreOutlined />} />
+        <Statistic title="Vendors" value={"300K+"} prefix={<SolutionOutlined />} />
+        <Statistic title="Drives" value={"400+"} prefix={<LinkOutlined />} />
+        </Space>
+      </Col>
+      <Col span={16} style={{padding:"170px 0px"}}>
+      <Title level={2} style={{ textAlign: "center" }}>SignIn to Continue</Title>
       <Form
         name="basic"
         labelCol={{
@@ -49,7 +61,6 @@ export default class Configure extends Component {
         onFinishFailed={this.onFinishFailed}
         autoComplete="off"
       >
-        <Title level={2} style={{ textAlign: "center" }}>SignIn to Continue</Title>
         <Form.Item
           label="Username"
           name="name"
@@ -85,6 +96,9 @@ export default class Configure extends Component {
           </Button>
         </Form.Item>
       </Form>
+      </Col>
+      </Row>
+      </Layout>
     );
   }
 }
