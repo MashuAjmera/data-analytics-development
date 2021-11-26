@@ -1,8 +1,9 @@
 import React, { Component } from "react";
-import { List, Button, message, Spin } from "antd";
+import { List, Button, message, Spin, Tag } from "antd";
+import { CheckCircleOutlined, ExclamationCircleOutlined  } from "@ant-design/icons";
 
 export default class Drives extends Component {
-  state = { drives: [], loadNext: false};
+  state = { drives: [], loadNext: false };
 
   componentDidMount() {
     const token = localStorage.getItem("Authorization");
@@ -33,7 +34,7 @@ export default class Drives extends Component {
       </div>
     ) : (
       <List
-        size="large"
+        size="small"
         dataSource={this.state.drives}
         renderItem={(item) => (
           <List.Item key={item._id}>
@@ -43,6 +44,11 @@ export default class Drives extends Component {
             >
               {item.name}
             </Button>
+            {item.approved ? <Tag icon={<CheckCircleOutlined />} color="success">
+              approved
+            </Tag> : <Tag icon={<ExclamationCircleOutlined  />} color="warning">
+              review pending
+            </Tag>}
           </List.Item>
         )}
       />
