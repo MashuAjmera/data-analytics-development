@@ -26,6 +26,11 @@ app.register_blueprint(drive_route_blueprint, url_prefix="/api/drives")
 app.register_blueprint(endpoint_route_blueprint, url_prefix="/api/endpoints")
 app.register_blueprint(protocol_route_blueprint, url_prefix="/api/protocols")
 
+@app.route("/api/downloader")
+def downloader():
+    return send_file(os.path.join(os.environ.get("API_DOWNLOAD_FOLDER"), 'Sensor Node Health Monitoring.img'),as_attachment=True)
+
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve(path):
