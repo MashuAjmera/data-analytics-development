@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Row, Col, Divider, Empty, message, Spin } from "antd";
 import Element from "./element.component";
 import AddDrive from "./addDrive.component";
+import Test from "./test.component";
 import AddEndpoint from "./addEndpoint.component";
 
 export default class Client extends Component {
@@ -57,6 +58,16 @@ export default class Client extends Component {
       </div>
     ) : (
       <>
+          <Test endpoints={this.state.client.endpoints} drives={this.state.client.drives}/>
+        <Row>
+          {/* <Col span={12}>
+            <Divider orientation="left">Rules</Divider>
+          </Col>
+          <Col span={12}>
+            <Divider orientation="right"> */}
+            {/* </Divider>
+          </Col> */}
+        </Row>
         <Row>
           <Col span={12}>
             <Divider orientation="left">Endpoints</Divider>
@@ -73,7 +84,7 @@ export default class Client extends Component {
         {this.state.client.endpoints.length >= 1 ? (
           <Row gutter={16}>
             {this.state.client.endpoints.map((endpoint) => (
-              <Col span={5} key={endpoint._id}>
+              <Col span={6} key={endpoint._id}>
               <Element element={endpoint} clientId={this.props._id} setClient={this.setClient} ename={"endpoint"}/>
               </Col>
             ))}
@@ -96,7 +107,7 @@ export default class Client extends Component {
         {this.state.client.drives.length >= 1 ? (
           <Row gutter={16}>
             {this.state.client.drives.map((drive) => (
-              <Col span={5} key={drive._id}>
+              <Col span={6} key={drive._id}>
                 <Element element={drive} clientId={this.props._id} setClient={this.setClient} ename={"drive"}/>
               </Col>
             ))}
