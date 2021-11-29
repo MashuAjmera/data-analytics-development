@@ -51,7 +51,7 @@ export default class App extends Component {
         <Content
           style={{
             padding: "100px 50px 0px 50px",
-            minHeight: "calc(100vh - 9.9vh)",
+            minHeight: "calc(100vh - 70px)",
 
           }}
         >
