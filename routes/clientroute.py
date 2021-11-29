@@ -308,6 +308,7 @@ def publishedClients():
 
             client = {
                 "name":queryresult2['name'],
+                "_id":queryresult2['_id'],
                 "drives":driveLists,
                 "endpoints":endpointLists
             }

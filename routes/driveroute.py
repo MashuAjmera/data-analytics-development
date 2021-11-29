@@ -68,7 +68,7 @@ def driveList():
         user = authorisationcheck(author)
     except:
         return jsonify('Invalid Token'),401
-    if user == 'governer' or user == 'onboarder':
+    if user == 'governer' or user == 'onboarder' or user == 'admin':
         cluster = mongo_client.MongoClient(clusterurl)
         db = cluster[dbname]
         collection = db[collectionname]
@@ -142,7 +142,7 @@ def drivebyId(id):
     else:
         return jsonify('Unauthorised Access'),401
 
-@drive_route_blueprint.route("/getapproval/<id>", methods = ["GET"])
+@drive_route_blueprint.route("/getapproval/<id>", methods = ["PUT"])
 def approveDrive(id):
     author = request.headers.get('Authorization')
     try:
@@ -231,7 +231,8 @@ def editdriveparameter(id,paramid):
                 param = {
                     "_id": parameter['_id'],
                     "name":paramname,
-                    "unit":parameter['unit']
+                    "unit":parameter['unit'],
+                    "Alias":parameter['Alias']
                 }
                 parameterList.append(param)
             else:
