@@ -9,7 +9,7 @@ export default class Drives extends Component {
     const token = localStorage.getItem("Authorization");
     if (token) {
       this.setState({ loadNext: true });
-      fetch("/api/drives/", {
+      fetch(`/api/drives/${this.props.approved?"approved":""}`, {
         headers: { Authorization: token },
       })
         .then((response) => response.json())
@@ -44,11 +44,11 @@ export default class Drives extends Component {
             >
               {item.name}
             </Button>
-            {item.approved ? <Tag icon={<CheckCircleOutlined />} color="success">
+            {!this.props.approved && (item.approved ? <Tag icon={<CheckCircleOutlined />} color="success">
               approved
             </Tag> : <Tag icon={<ExclamationCircleOutlined  />} color="warning">
               review pending
-            </Tag>}
+            </Tag>)}
           </List.Item>
         )}
       />

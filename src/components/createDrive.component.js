@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Form, Select, Button, message, Typography, Input, PageHeader, Space, Row, Col } from "antd";
+import { Form, Select, Button, message, Typography, Input, Space, Row, Col } from "antd";
 import { UploadOutlined, ApiOutlined } from "@ant-design/icons";
 import DataPoints from "./dataPoints.component";
 import Drives from "./drives.component";
@@ -7,7 +7,7 @@ export default class CreateDrive extends Component {
   state = {
     count: 1,
     protocols: [],
-    loadButton:false,
+    loadButton: false,
     parameters: [],
     selectedItems: [],
     loadProtocols: false
@@ -50,7 +50,7 @@ export default class CreateDrive extends Component {
     const fileReader = new FileReader();
     fileReader.readAsText(e.target.files[0], "UTF-8");
     fileReader.onload = e => {
-      this.setState({parameters:JSON.parse(e.target.result)})
+      this.setState({ parameters: JSON.parse(e.target.result) })
     };
   };
 
@@ -62,13 +62,8 @@ export default class CreateDrive extends Component {
         editable: true,
       },
       {
-        title: "Name",
+        title: "Alias Name",
         dataIndex: "name",
-        editable: true,
-      },
-      {
-        title: "Alias",
-        dataIndex: "Alias",
         editable: true,
       },
       {
@@ -84,7 +79,7 @@ export default class CreateDrive extends Component {
         this.setState({ loadButton: true });
         let x = {
           name: values.name,
-          protocols: this.state.selectedItems.map(item=>({_id:item})),
+          protocols: this.state.selectedItems.map(item => ({ _id: item })),
           parameters: this.state.parameters
         }
         fetch("/api/drives/createdrive", {
@@ -99,7 +94,7 @@ export default class CreateDrive extends Component {
           })
           .then((data) => {
             this.setState({ loadButton: false });
-            message.success("Drive Created Successfully!");
+            message.success("Drive Submitted Successfully!");
           })
           .catch((error) => message.warning({ content: error }));
       }
@@ -121,113 +116,102 @@ export default class CreateDrive extends Component {
           className="site-layout-background"
           style={{ padding: 24, backgroundColor: "white", height: "36rem" }}
         >
-          <Drives handleClick={this.handleClick} />
+          <Title level={5}>Drives Status</Title>
+          <Drives />
         </div>
       </Col>
       <Col span={18}>
-      <Form
-        name="basic"
-        labelCol={{
-          span: 6,
-        }}
-        wrapperCol={{
-          span: 12,
-        }}
-        initialValues={{
-          remember: true,
-        }}
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
-        autoComplete="off"
-      >
-
-        {/* <PageHeader
-          className="site-page-header"
-          title={<Title level={2}>Onboard your drives</Title>}
-          extra={[
-            <Button type="primary" htmlType="submit" loading={this.state.loadButton} icon={<ApiOutlined />}>
-              Create Drive
-            </Button>,
-          ]}
-        /> */}
-
-<Title level={2} style={{ textAlign: "center" }}>Onboard New Drive</Title>
-        <Form.Item
-          label="Name"
-          name="name"
-          rules={[
-            {
-              required: true,
-              message: "Please input your password!",
-            },
-          ]}
+        <Form
+          name="basic"
+          labelCol={{
+            span: 6,
+          }}
+          wrapperCol={{
+            span: 12,
+          }}
+          initialValues={{
+            remember: true,
+          }}
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
+          autoComplete="off"
         >
-          <Input placeholder="Enter virtual drive name" />
-        </Form.Item>
-        <Form.Item
-          label="Protocols"
-          name="protocols"
-          rules={[
-            {
-              required: true,
-              message: "Please input your password!",
-            },
-          ]}
-        >
-          <Select
-            mode="multiple"
-            value={selectedItems.map(p => p.name)}
-            showSearch
-            placeholder={`Select Protocols to Add`}
-            optionFilterProp="children"
-            filterOption={(input, option) =>
-              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-            }
-            onChange={this.handleChange}
+          <Title level={2} style={{ textAlign: "center" }}>Onboard New Drive</Title>
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[
+              {
+                required: true,
+                message: "Please input your password!",
+              },
+            ]}
           >
-            {filteredOptions.map((section) => (
-              <Select.Option key={section._id} value={section._id}>
-                {section.name}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-        <Form.Item
-          label="Parameters"
-          name="parameters"
-        >
-          <Space>
-            <Button
-              icon={<UploadOutlined />}
-              onClick={this.handleAdd}
-              danger
-              style={{
-                marginBottom: 16,
-              }}
+            <Input placeholder="Enter virtual drive name" />
+          </Form.Item>
+          <Form.Item
+            label="Protocols"
+            name="protocols"
+            rules={[
+              {
+                required: true,
+                message: "Please input your password!",
+              },
+            ]}
+          >
+            <Select
+              mode="multiple"
+              value={selectedItems.map(p => p.name)}
+              showSearch
+              placeholder={`Select Protocols to Add`}
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
+              onChange={this.handleChange}
             >
-              Add a Parameter
-            </Button>
-            {/* <Upload {...props}>
+              {filteredOptions.map((section) => (
+                <Select.Option key={section._id} value={section._id}>
+                  {section.name}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label="Parameters"
+            name="parameters"
+          >
+            <Space>
+              <Button
+                icon={<UploadOutlined />}
+                onClick={this.handleAdd}
+                danger
+                style={{
+                  marginBottom: 16,
+                }}
+              >
+                Add a Parameter
+              </Button>
+              {/* <Upload {...props}>
               <Button icon={<UploadOutlined />}>Upload</Button>
             </Upload> */}
-            <input type="file" onChange={this.handleFile} id="image_uploads" name="image_uploads" style={{marginTop:"-17px"}} />
-          </Space>
-          <DataPoints
-            columns={columns}
-            handleClick={this.handleClick}
-            dataSource={this.state.parameters}
-          />
-        </Form.Item>
-        <Form.Item
-          wrapperCol={{
-            offset: 6,
-          }}
-        >
+              <input type="file" onChange={this.handleFile} id="image_uploads" name="image_uploads" style={{ marginTop: "-17px" }} />
+            </Space>
+            <DataPoints
+              columns={columns}
+              dataSource={this.state.parameters}
+            />
+          </Form.Item>
+          <Form.Item
+            wrapperCol={{
+              offset: 6,
+            }}
+          >
             <Button type="primary" htmlType="submit" loading={this.state.loadButton} icon={<ApiOutlined />}>
-              Create Drive
+              Submit for Approval
             </Button>
-        </Form.Item>
-      </Form></Col></Row>
+          </Form.Item>
+        </Form></Col></Row>
     );
   }
 }

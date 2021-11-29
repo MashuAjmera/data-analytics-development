@@ -48,7 +48,7 @@ export default class Nav extends Component {
               marginBottom: "10px",
             }}
           >
-            Drive Data Centric App Toolkit
+           Data Centric App Development Toolkit
           </Title>
         </Menu.Item>
         {this.props.login && (

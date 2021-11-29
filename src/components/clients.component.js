@@ -127,7 +127,7 @@ export default class Clients extends Component {
       <>
         <PageHeader
           className="site-page-header"
-          title={<Title level={2}>Client Dashboard</Title>}
+          title={<Title level={2}>App Development Dashboard</Title>}
           extra={[
             <Popover
               content={
@@ -140,7 +140,7 @@ export default class Clients extends Component {
               }
             >
               <Button type="primary" icon={<PlusOutlined />}>
-                Create Client
+                Create App
               </Button>
             </Popover>,
           ]}
@@ -157,7 +157,8 @@ export default class Clients extends Component {
                 key={client._id}
                 extra={[
                   client.publish ? (
-                    <Button type="text" disabled>
+                    <Button type="text" disabled
+                    size="small">
                       Published
                     </Button>
                   ) : (
@@ -165,6 +166,8 @@ export default class Clients extends Component {
                       type="text"
                       onClick={() => this.publish(client._id)}
                       loading={this.state.loadPublish}
+                      danger
+                      size="small"
                     >
                       Publish
                     </Button>

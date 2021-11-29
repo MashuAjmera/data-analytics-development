@@ -1,10 +1,11 @@
 import React, { Component } from "react";
-import { message, Row, Col, Typography, Empty } from "antd";
+import { message, Row, Col, Typography, Empty,PageHeader, Button } from "antd";
+import { LikeOutlined } from "@ant-design/icons";
 import Drives from "./drives.component";
 import DataPoints from "./dataPoints.component";
 
 export default class Harmonize extends Component {
-  state = { drive: null,empty:true };
+  state = { drive: null,empty:true, loadApprove:false };
 
   handleClick = (_id) => {
     const token = localStorage.getItem("Authorization");
@@ -43,6 +44,23 @@ export default class Harmonize extends Component {
     }
   };
 
+  handleApprove=()=>{
+    const token = localStorage.getItem("Authorization");
+    if (token) {
+      this.setState({ loadApprove:true});
+      fetch(`/api/drives/getapproval/${this.state.drive._id}`, {
+        headers: { Authorization: token },
+        method:"PUT"
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          this.setState({ loadApprove:false });
+          message.success(`Drive ${this.state.drive.name} Approved.`)
+        })
+        .catch((error) => message.warning({ content: error }));
+      }
+  }
+
   render() {
     const columns = [
       {
@@ -53,6 +71,10 @@ export default class Harmonize extends Component {
         title: "Name",
         dataIndex: "name",
         editable: true,
+      },
+      {
+        title: "Alias (Synthetic) Name",
+        dataIndex: "Alias",
       },
       {
         title: "Unit",
@@ -71,7 +93,11 @@ export default class Harmonize extends Component {
               className="site-layout-background"
               style={{ padding: 24, backgroundColor: "white", height: "32rem" }}
             >
-            <Typography.Title level={4}>          Select a Drive        </Typography.Title>
+            <PageHeader
+              className="site-page-header"
+              title={<Typography.Title level={4}>Select Drive to Review</Typography.Title>}
+            />
+            {/* <Typography.Title level={4}>          Select Drive to Review       </Typography.Title> */}
               <Drives handleClick={this.handleClick} />
             </div>
           </Col>
@@ -81,7 +107,18 @@ export default class Harmonize extends Component {
               style={{ padding: 24, backgroundColor: "white", height: "32rem" }}
             >
             {this.state.empty ?
-          <Empty description={<span>No drive selected yet!</span>} style={{marginTop:"10rem"}}/> : <><Typography.Title level={4}> Edit required name</Typography.Title>
+          <Empty description={<span>No drive selected yet!</span>} style={{marginTop:"10rem"}}/> : <>
+          {/* <Typography.Title level={4}> Edit required name</Typography.Title> */}
+              
+        <PageHeader
+          className="site-page-header"
+          title={<Typography.Title level={4}>Edit required name</Typography.Title>}
+          extra={[
+            <Button type="primary" loading={this.state.loadApprove} icon={<LikeOutlined />} onClick={this.handleApprove}>
+              Approve
+            </Button>,
+          ]}
+        />
               <DataPoints
                 columns={columns}
                 handleClick={this.handleClick}

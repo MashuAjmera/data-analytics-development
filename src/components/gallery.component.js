@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import { Card, Col, Row, Avatar, Rate, Spin, message, Typography, Layout, Divider, Input, Checkbox, Slider } from "antd";
-import { CloudDownloadOutlined, EllipsisOutlined } from "@ant-design/icons";
+import { Card, Col, Row, Avatar, Rate, Spin, message, Typography, Layout, Divider, Input, Checkbox, Slider, Popover, Button } from "antd";
+import { CloudDownloadOutlined, CloudServerOutlined } from "@ant-design/icons";
 import logo from "../static/favicon.png";
 
 export default class AppGallery extends Component {
-  state = { apps: [], loadClients: false }
+  state = { apps: [], loadClients: false, docker: null }
   componentDidMount() {
     const token = localStorage.getItem("Authorization");
     if (token) {
@@ -19,6 +19,10 @@ export default class AppGallery extends Component {
         })
         .catch((error) => message.warning({ content: error }));
     }
+  }
+
+  showDocker = (_id) => {
+
   }
   render() {
     // const data = [
@@ -82,9 +86,11 @@ export default class AppGallery extends Component {
             {this.state.apps.map((d) => (
               <Col span={12}>
                 <Card style={{ marginTop: 16 }}
-                  actions={[
-                    <CloudDownloadOutlined key="download" />,
-                    <EllipsisOutlined key="ellipsis" />,
+                  actions={[<Button icon={<CloudDownloadOutlined/>} type="text" key="download" href='http://localhost:5000/api/downloader' download>Download Image</Button>,
+                    <Popover placement="bottom" title="Copy container image" content={<Text copyable>{`abbregistry/${d._id}:latest`}</Text>} trigger="click">
+                      <Button icon={<CloudServerOutlined/>} type="text" key="copy" danger onClick={this.showDocker} >Copy Image Name</Button>
+                    </Popover>
+                    ,
                   ]}>
                   <Card.Meta
                     avatar={<Avatar src={logo} />}
@@ -92,7 +98,6 @@ export default class AppGallery extends Component {
                     description={<>
                       <Paragraph ><Text strong>endpoints</Text>: {d.endpoints.map(e => e + ", ")}<br />
                         <Text strong>drives</Text>: {d.drives.map(e => e + ", ")}</Paragraph >
-                      <Rate disabled defaultValue={4} />
                     </>}
                   />
                 </Card>

@@ -122,7 +122,9 @@ export default class DataPoints extends Component {
         body: JSON.stringify({ [which]: row[which] })
       }).then(response => response.json())
       .then((data) => {
-        this.props.handleClick(this.props._id);
+        if(this.props.handleClick){
+          this.props.handleClick(this.props._id);
+        }
         message.success({ content: "successfully updated", key });
       })
         .catch(error => message.warning({ content: error, key }));
@@ -164,7 +166,7 @@ export default class DataPoints extends Component {
             columns={columns2}
             dataSource={this.props.dataSource.map(data=>{data.key=data._id; return data;})}
             pagination={false}
-            scroll={{ y: "26em" }}
+            scroll={{ y: "24em" }}
           />
         ) : (
           <div className="example">
