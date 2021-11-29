@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { Modal, Steps, Button, message, Form, Space } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import CodeEditor from "@uiw/react-textarea-code-editor";
 import Sections from "./sections.component";
 import DataPoints from "./dataPoints.component";
+import Rules from "./rules.component";
 import Drives from "./drives.component";
 
 export default class AddDrive extends Component {
@@ -159,7 +159,7 @@ export default class AddDrive extends Component {
     const steps = [
       {
         title: "Drive",
-        content: <Drives handleClick={this.handleClick} />,
+        content: <Drives handleClick={this.handleClick} approved={true} />,
       },
       {
         title: "Data Points",
@@ -183,33 +183,7 @@ export default class AddDrive extends Component {
       },
       {
         title: "Rules",
-        content: (
-          <>
-            Modify the code below or{" "}
-            <Button
-              type="link"
-              href="http://localhost:8000/red"
-              target="_blank"
-              size="small"
-            >
-              use GUI
-            </Button>
-            .
-            <CodeEditor
-              value={this.state.code}
-              language="py"
-              placeholder="Please enter PY code."
-              onChange={(evn) => this.setState({ code: evn.target.value })}
-              padding={15}
-              style={{
-                fontSize: 12,
-                backgroundColor: "#f5f5f5",
-                fontFamily:
-                  "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
-              }}
-            />
-          </>
-        ),
+        content: <Rules/>,
       },
       {
         title: "Protocol",
