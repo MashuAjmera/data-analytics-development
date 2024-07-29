@@ -70,7 +70,7 @@ export default class App extends Component {
             </>
           )}
         </Content>
-        <Footer style={{ textAlign: "center" }}>© 2021 ABB Ltd.</Footer>
+        <Footer style={{ textAlign: "center" }}>© 2024 Mashu Ajmera</Footer>
       </Layout>
       </BrowserRouter>
     );
