@@ -29,16 +29,15 @@ def returnExistingUser(name):
     cluster = mongo_client.MongoClient(clusterurl)
     db = cluster[dbname]
     collection = db[collectionname]
-    result = collection.find_one({"name":name})
-    #print(result)
+    result = collection.find_one({"name": name})
     return result
 
 def authorisationcheck(token):
     fernettok = Fernet(tokenkey)
     #encMessage = fernet.encrypt(token.encode())
-    decMessage = fernettok.decrypt(token.encode())
-    # return decMessage.decode()
-    return 'admin'
+    # decMessage = fernettok.decrypt(token.encode()) # to be uncommented after fix
+    # return decMessage.decode() # to be uncommented after fix
+    return 'admin' # to be removed after fix
 
 @user_route_blueprint.before_app_request
 def before_first_request():
@@ -47,11 +46,10 @@ def before_first_request():
 
 @user_route_blueprint.route("/checkuser", methods = ["GET"])
 def checkUser():
-    #adminstatus = False
     author = request.headers.get('Authorization')
     try:
         user = authorisationcheck(author)
-        return {"token":author,"type":user}, 200
+        return {"token":author, "type":user}, 200
     except:
         return jsonify('Invalid Token'), 400
     
