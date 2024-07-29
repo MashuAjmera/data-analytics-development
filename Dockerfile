@@ -1,7 +1,7 @@
 FROM node:12.18.0-alpine as build
 COPY . /app
 WORKDIR /app
-RUN npm ci
+RUN npm install
 RUN npm run build
 RUN rm -r public src
 RUN apk add python3
