@@ -1,9 +1,9 @@
 FROM node:12.18.0-alpine as build
 COPY . /app
 WORKDIR /app
-RUN apk update && apk add --no-cache build-base python3-dev libffi-dev py3-pip
-RUN pip3 install --upgrade pip setuptools wheel
-RUN pip3 cache purge && pip3 install --no-cache-dir -r requirements.txt
+RUN apk add python3
+RUN apk add py3-pip
+RUN pip3 install -r requirements.txt
 RUN npm install
 RUN npm run build
 RUN rm -r public src
