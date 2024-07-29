@@ -36,7 +36,7 @@ export default class Nav extends Component {
         selectedKeys={[this.state.current]}
       >
         <Menu.Item key="1">
-          <img className="logo" src={logo} alt="ABB logo" />
+          <img className="logo" src={logo} alt="Mashu Ajmera logo" />
         </Menu.Item>
         <Menu.Item key="2">
           <Title
@@ -48,7 +48,7 @@ export default class Nav extends Component {
               marginBottom: "10px",
             }}
           >
-           Data Analytics App Development Toolkit
+           Data Analytics App Development Platform
           </Title>
         </Menu.Item>
         {this.props.login && (
