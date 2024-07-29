@@ -13,7 +13,7 @@ import os
 
 drive_route_blueprint = Blueprint('drive_route_blueprint', __name__)
 
-clusterurl = "mongodb+srv://Ashwin:Hackathonmongo@ashwinhackathon.u0vht.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+clusterurl = os.getenv('URI')
 dbname = "informationModel"
 collectionname = "drives"
 
