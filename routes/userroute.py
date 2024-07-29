@@ -41,7 +41,7 @@ def authorisationcheck(token):
     #print(decMessage)
     return decMessage.decode()
 
-@user_route_blueprint.before_app_first_request
+@user_route_blueprint.before_app_request
 def before_first_request():
     global tokenkey
     tokenkey = Fernet.generate_key()
