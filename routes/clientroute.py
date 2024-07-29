@@ -1,5 +1,5 @@
 from flask import Flask, request, send_from_directory, jsonify, send_file
-from pymongo.message import delete
+# from pymongo.message import delete
 import requests
 import pymongo
 from pymongo import mongo_client
