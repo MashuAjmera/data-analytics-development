@@ -168,7 +168,7 @@ export default class Clients extends Component {
                       danger
                       size="small"
                     >
-                      Submit for Approval
+                      Publish
                     </Button>
                   ),
                   <Tooltip title="Click to delete app"><DeleteOutlined onClick={() => genExtra(client._id)} /></Tooltip>,
