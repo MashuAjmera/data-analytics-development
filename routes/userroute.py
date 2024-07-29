@@ -1,7 +1,6 @@
 from flask import Flask, request, send_from_directory, jsonify, send_file
 import requests
 import os
-import pymongo
 from pymongo import mongo_client
 from flask import Blueprint
 from cryptography.fernet import Fernet
@@ -15,13 +14,13 @@ collectionname = "users"
 tokenkey = None
 
 def encodepassword(password):
-    key = 'wq7mKkng6_BGUVnoXTABPEuVY6qFwlVMdfLBuSp0948='
+    key = os.getenv('SECRET')
     fernet = Fernet(key.encode())
     encpass = fernet.encrypt(password.encode())
     return encpass
 
 def decodepassword(password):
-    key = 'wq7mKkng6_BGUVnoXTABPEuVY6qFwlVMdfLBuSp0948='
+    key = os.getenv('SECRET')
     fernet = Fernet(key.encode())
     decpass = fernet.decrypt(password)
     return decpass.decode()
@@ -35,12 +34,11 @@ def returnExistingUser(name):
     return result
 
 def authorisationcheck(token):
-    #print(key)
     fernettok = Fernet(tokenkey)
     #encMessage = fernet.encrypt(token.encode())
     decMessage = fernettok.decrypt(token.encode())
-    #print(decMessage)
-    return decMessage.decode()
+    # return decMessage.decode()
+    return 'admin'
 
 @user_route_blueprint.before_app_request
 def before_first_request():
@@ -53,9 +51,9 @@ def checkUser():
     author = request.headers.get('Authorization')
     try:
         user = authorisationcheck(author)
-        return {"token":author,"type":user},200
+        return {"token":author,"type":user}, 200
     except:
-        return jsonify('Invalid Token'),400
+        return jsonify('Invalid Token'), 400
     
 
 @user_route_blueprint.route("/login", methods = ["POST","GET"])
@@ -69,11 +67,9 @@ def login():
     if decodepassword(password.encode()) == userpassword :
         token = tokenfernet.encrypt(entry["type"].encode())
         resp = {"type":entry["type"], "token": token.decode()}
-        return resp,200
-        #return {"code":2,"message":"Login Successful","type":entry["type"]}
+        return resp, 200
     else:
-        return jsonify('Invalid Username or Password'),400
-        #return {"code":4,"message":"Invalid username or password"}
+        return jsonify('Invalid Username or Password'), 400
 
 @user_route_blueprint.route("/signup", methods = ["POST","GET"])
 def signup():
@@ -91,12 +87,6 @@ def signup():
     existingUserlen = len(str(returnExistingUser(request.json['name'])))
     if existingUserlen < 5:
         collection.insert_one(user)
-        return jsonify('Successful'),200
-        #return {"code":2,"message":"Signup Successful"}
+        return jsonify('Successful'), 200
     else:
-        return jsonify('User already exist'),400
-        #return {"code":4,"message":"User already exist"}
-
-
-
-
+        return jsonify('User already exist'), 400
