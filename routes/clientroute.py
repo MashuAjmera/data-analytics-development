@@ -6,14 +6,14 @@ from pymongo import mongo_client
 from flask import Blueprint
 from cryptography.fernet import Fernet
 from bson.objectid import ObjectId
-import json
+import json, os
 from routes.driveroute import createDrive, driveList
 from routes.userroute import authorisationcheck
 from pymongo import ReturnDocument
 
 client_route_blueprint = Blueprint('client_route_blueprint', __name__)
 
-clusterurl = "mongodb+srv://Ashwin:Hackathonmongo@ashwinhackathon.u0vht.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+clusterurl = os.getenv('URI')
 dbname = "userData"
 collectionname = "clients"
 
