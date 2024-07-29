@@ -48,7 +48,7 @@ export default class Nav extends Component {
               marginBottom: "10px",
             }}
           >
-           Data Flow App Development Toolkit
+           Data Analytics App Development Toolkit
           </Title>
         </Menu.Item>
         {this.props.login && (
