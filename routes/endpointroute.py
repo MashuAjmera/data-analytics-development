@@ -5,12 +5,12 @@ from pymongo import mongo_client
 from flask import Blueprint
 from cryptography.fernet import Fernet
 from bson.objectid import ObjectId
-import json
+import json, os
 from routes.userroute import authorisationcheck
 
 endpoint_route_blueprint = Blueprint('endpoint_route_blueprint', __name__)
 
-clusterurl = "mongodb+srv://Ashwin:Hackathonmongo@ashwinhackathon.u0vht.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+clusterurl = os.getenv('URI')
 dbname = "informationModel"
 collectionname = "endpoints"
 
