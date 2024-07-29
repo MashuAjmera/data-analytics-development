@@ -56,7 +56,6 @@ export default class Clients extends Component {
     const token = localStorage.getItem("Authorization");
     if (token) {
       this.setState({ createClientLoading: true });
-      // FETCH POST /api/clients/add -> create a blank client
       fetch("/api/clients/add", {
         method: "POST",
         headers: {
@@ -132,7 +131,7 @@ export default class Clients extends Component {
             <Popover
               content={
                 <Input.Search
-                  placeholder="input client name"
+                  placeholder="input new app name"
                   onSearch={this.createClient}
                   loading={this.state.createClientLoading}
                   enterButton={<FolderAddOutlined />}
@@ -169,10 +168,10 @@ export default class Clients extends Component {
                       danger
                       size="small"
                     >
-                      Publish
+                      Submit for Approval
                     </Button>
                   ),
-                  <Tooltip title="Click to delete client"><DeleteOutlined onClick={() => genExtra(client._id)} /></Tooltip>,
+                  <Tooltip title="Click to delete app"><DeleteOutlined onClick={() => genExtra(client._id)} /></Tooltip>,
                 ]}
               >
                 <Client _id={client._id} user={this.props.user} />
