@@ -1,4 +1,4 @@
-# Data Flow App Development Toolkit
+# Data Flow App Development Platform
 # Vision
 This project envisions a platform to 
 - **onboard a sensor** (parameters the sensor can measure and protocols using which it can communicate)
